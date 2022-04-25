@@ -1,0 +1,88 @@
+select *
+from tblOrganization
+where OrganizationTypesId = 1
+
+select *
+from tblUsers
+where OrganizationID = 66
+
+select *
+from tblMasterEmailTemplate
+
+SELECT *
+from tblOrganization
+order by OrganizationID desc
+
+
+
+select top 1
+    *
+from [dbo].[tblUserRoles]
+order by UserRoleID desc
+
+select top 1
+    [TokenGuid],
+    [InvitedURL]
+from [dbo].[tblAccountInvites]
+order by InviteSentDate desc
+
+-- Table for Users
+
+Select *
+from tblUsers
+order by UserID desc
+
+select top 1
+    [dbo].[UDF_StringDecryptor](UserName) As UserName,
+    [dbo].[UDF_StringDecryptor](UserPassword) As UserPassword
+from [tblUsers]
+order by UserID desc
+
+-- Table for User Profiles
+
+select top 1
+    *
+from [dbo].[tblUserProfiles]
+order by UserProfileID desc
+
+select top 1
+    [dbo].[UDF_StringDecryptor](FirstName) As FirstName,
+    [dbo].[UDF_StringDecryptor](MiddleName) As MiddleName,
+    [dbo].[UDF_StringDecryptor](LastName) As LastName,
+    [dbo].[UDF_StringDecryptor](EmailAddress) As EmailAddress,
+    [dbo].[UDF_StringDecryptor](PrimaryContactNumber) As PrimaryContactNumber,
+    [dbo].[UDF_StringDecryptor](SecondaryContactNumber) As SecondaryContactNumber,
+    [dbo].[UDF_StringDecryptor](Age) As Age
+from tblUserProfiles
+order by UserProfileID desc
+
+
+-- Table invites
+
+select top 1
+    *
+from [dbo].[tblAccountInvites]
+order by InviteSentDate desc
+
+select [AccountInviteGuid],
+       [dbo].[UDF_StringDecryptor](FirstName) As FirstName,
+       [dbo].[UDF_StringDecryptor](LastName) As LastName,
+       [dbo].[UDF_StringDecryptor](EmailAddress) As EmailAddress
+from [dbo].[tblAccountInvites]
+order by InviteSentDate desc
+
+select *
+from [dbo].[tblAccountInvites]
+where [dbo].[UDF_StringDecryptor](EmailAddress) LIKE '%' + 'parveenk@yopmail.com' + '%'
+
+
+-- login information
+
+SELECT UD.UserID,
+       [AccountInviteGuid],
+       [dbo].[UDF_StringDecryptor](UD.UserName) As UserName,
+       [dbo].[UDF_StringDecryptor](UD.UserPassword) As UserPassword,
+       [OrganizationID],
+       [IsChild]
+from [dbo].[tblUsers] UD
+

@@ -1,0 +1,321 @@
+SET IDENTITY_INSERT [dbo].[tblSiteUIAction] ON 
+GO
+INSERT [dbo].[tblSiteUIAction] ([ActionID], [ActionName]) VALUES (1, N'Read Only')
+GO
+INSERT [dbo].[tblSiteUIAction] ([ActionID], [ActionName]) VALUES (2, N'Edit')
+GO
+INSERT [dbo].[tblSiteUIAction] ([ActionID], [ActionName]) VALUES (3, N'Communicate')
+GO
+INSERT [dbo].[tblSiteUIAction] ([ActionID], [ActionName]) VALUES (4, N'Reporting')
+GO
+INSERT [dbo].[tblSiteUIAction] ([ActionID], [ActionName]) VALUES (5, N'IsSMTP')
+GO
+INSERT [dbo].[tblSiteUIAction] ([ActionID], [ActionName]) VALUES (6, N'IsDB')
+GO
+SET IDENTITY_INSERT [dbo].[tblSiteUIAction] OFF
+
+
+SET IDENTITY_INSERT [dbo].[tblSiteMasterCountry] ON 
+GO
+INSERT [dbo].[tblSiteMasterCountry] ([ID], [Name], [CountryCode]) VALUES (1, N'India', N'IN')
+GO
+INSERT [dbo].[tblSiteMasterCountry] ([ID], [Name], [CountryCode]) VALUES (2, N'United States', N'US')
+GO
+SET IDENTITY_INSERT [dbo].[tblSiteMasterCountry] OFF
+GO
+
+
+
+
+SET IDENTITY_INSERT [dbo].[tblSiteMasterEmailTemplate] ON 
+GO
+INSERT [dbo].[tblSiteMasterEmailTemplate] ([EmailTemplateGuid], [EmailTemplateCode], [EmailTemplateName], [EmailTemplateDescription], [IsActive], [IsDeleted], [EmailTemplateType], [EmailTemplateSenderName], [EmailTemplateSubject], [EmailTemplateID], [EmailTemplateSenderEmailAddress], [EmailTemplateBody]) VALUES (N'1bfc0997-ad0d-4244-8cef-c02db74dc5c3', N'AA00', N'Mail Template', N'Hello NAME
+
+You have been invited to join [#CRLINK#] as administrator. You can use it to below link to set up your account.
+
+ACCOUNTSETUPLINK
+
+Best
+The [#CRLINK#] team	', 1, 0, 1, N'test@yopmail.com', N'Superadmin Activation link', 1, N'test@yopmail.com', N'Hello NAME
+
+You have been invited to join [#CRLINK#] as administrator. You can use it to below link to set up your account.
+
+ACCOUNTSETUPLINK
+
+Best
+The [#CRLINK#] team')
+GO
+INSERT [dbo].[tblSiteMasterEmailTemplate] ([EmailTemplateGuid], [EmailTemplateCode], [EmailTemplateName], [EmailTemplateDescription], [IsActive], [IsDeleted], [EmailTemplateType], [EmailTemplateSenderName], [EmailTemplateSubject], [EmailTemplateID], [EmailTemplateSenderEmailAddress], [EmailTemplateBody]) VALUES (N'3ef14e9f-3ee3-485e-9b4a-bbe5fd010e69', N'AA01', N'Test', N'Hello NAME    Please Procced with this StudyInvitelink to accept CSStudy CODE - CsStudyCode [srtDesc]', 1, 0, 1, N'TestUser', N'Test', 2, N'test@yopmail.com', N'Hello NAME    Please Procced with this StudyInvitelink to accept CSStudy CODE - CsStudyCode [srtDesc]')
+GO
+INSERT [dbo].[tblSiteMasterEmailTemplate] ([EmailTemplateGuid], [EmailTemplateCode], [EmailTemplateName], [EmailTemplateDescription], [IsActive], [IsDeleted], [EmailTemplateType], [EmailTemplateSenderName], [EmailTemplateSubject], [EmailTemplateID], [EmailTemplateSenderEmailAddress], [EmailTemplateBody]) VALUES (N'30428b53-68e3-4224-9733-1aeb059dfade', N'AA02', N'string', N'string', 0, 1, 0, N'string', N'string', 3, N'string', N'string')
+GO
+SET IDENTITY_INSERT [dbo].[tblSiteMasterEmailTemplate] OFF
+
+
+
+SET IDENTITY_INSERT [dbo].[tblSiteMasterOrganizationType] ON 
+GO
+INSERT [dbo].[tblSiteMasterOrganizationType] ([OrganizationTypeID], [OrganizationTypeGuid], [OrganizationTypeName], [IsActive], [IsDeleted], [DeletedBy], [DeletedOn], [CreatedBy], [CreatedOn], [ModifiedBy], [ModifiedOn], [DomainID]) VALUES (1, N'e41c061f-cfdf-4019-8f98-5e1ef8ef7594', N'0rganization', 1, 0, NULL, NULL, NULL, NULL, NULL, NULL, 1)
+GO
+INSERT [dbo].[tblSiteMasterOrganizationType] ([OrganizationTypeID], [OrganizationTypeGuid], [OrganizationTypeName], [IsActive], [IsDeleted], [DeletedBy], [DeletedOn], [CreatedBy], [CreatedOn], [ModifiedBy], [ModifiedOn], [DomainID]) VALUES (2, N'2d7dfc42-81e0-482b-bbab-e4029fe88402', N'Sponsor', 1, 0, NULL, NULL, NULL, NULL, NULL, NULL, 2)
+GO
+INSERT [dbo].[tblSiteMasterOrganizationType] ([OrganizationTypeID], [OrganizationTypeGuid], [OrganizationTypeName], [IsActive], [IsDeleted], [DeletedBy], [DeletedOn], [CreatedBy], [CreatedOn], [ModifiedBy], [ModifiedOn], [DomainID]) VALUES (3, N'73b0f6eb-f2be-4230-a9fa-e12b87646102', N'Principal Investigator', 1, 0, NULL, NULL, NULL, NULL, NULL, NULL, 3)
+GO
+INSERT [dbo].[tblSiteMasterOrganizationType] ([OrganizationTypeID], [OrganizationTypeGuid], [OrganizationTypeName], [IsActive], [IsDeleted], [DeletedBy], [DeletedOn], [CreatedBy], [CreatedOn], [ModifiedBy], [ModifiedOn], [DomainID]) VALUES (4, N'c22a338b-a573-4d96-bcc3-9e5d285cb390', N'CRO', 1, 0, NULL, NULL, NULL, NULL, NULL, NULL, 4)
+GO
+INSERT [dbo].[tblSiteMasterOrganizationType] ([OrganizationTypeID], [OrganizationTypeGuid], [OrganizationTypeName], [IsActive], [IsDeleted], [DeletedBy], [DeletedOn], [CreatedBy], [CreatedOn], [ModifiedBy], [ModifiedOn], [DomainID]) VALUES (5, N'cb48fbfe-d15b-479c-9e04-6e2e9edb0117', N'Participant', 1, 0, NULL, NULL, NULL, NULL, NULL, NULL, 5)
+GO
+SET IDENTITY_INSERT [dbo].[tblSiteMasterOrganizationType] OFF
+
+
+
+
+
+SET IDENTITY_INSERT [dbo].[tblSiteMasterState] ON 
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (1, N'Maharashtra', 1)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (2, N'	West Bengal', 1)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (3, N'Madhya Pradesh', 1)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (4, N'Delhi', 1)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (5, N'Goa', 1)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (6, N'Virginia', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (7, N'Washington', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (8, N'New York', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (9, N'New Jersey', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (10, N'Louisiana', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (11, N'Alaska', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (12, N'Florida', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (13, N'Georgia', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (14, N'New Hampshire', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (15, N'Ohio', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (16, N'Alabama', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (17, N'Arizona', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (18, N'Arkansas', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (19, N'California', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (20, N'Colorado', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (21, N'Connecticut', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (22, N'Delaware', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (23, N'Hawaii', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (24, N'Idaho', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (25, N'Illinois', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (26, N'Indiana', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (27, N'Iowa', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (28, N'Kansas', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (29, N'Kentucky', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (30, N'Maine', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (31, N'Maryland', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (32, N'Massachusetts', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (33, N'Michigan', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (34, N'Minnesota', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (35, N'Mississippi', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (36, N'Missouri', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (37, N'Montana', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (38, N'Nebraska', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (39, N'Nevada', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (40, N'New Mexico', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (41, N'North Carolina', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (42, N'North Dakota', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (43, N'Oklahoma', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (44, N'Oregon', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (45, N'Pennsylvania', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (46, N'Rhode Island', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (47, N'South Carolina', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (48, N'South Dakota', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (49, N'Tennessee', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (50, N'Texas', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (51, N'Utah', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (52, N'Vermont', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (53, N'West Virginia', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (54, N'Wisconsin', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (55, N'Wyoming', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (56, N'Puerto Rico', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (57, N'Guam', 2)
+GO
+INSERT [dbo].[tblSiteMasterState] ([ID], [Name], [CountryID]) VALUES (58, N'US Virgin Islands', 2)
+GO
+SET IDENTITY_INSERT [dbo].[tblSiteMasterState] OFF
+
+
+
+SET IDENTITY_INSERT [dbo].[tblSiteUISideMenu] ON 
+GO
+INSERT [dbo].[tblSiteUISideMenu] ([UISideMenuID], [OrganizationTypeID], [Header], [Navigationlink], [ClassStyle], [Order], [ParentSideMenuID]) VALUES (1, 1, N'Dashboard', N'/organization/dashboard', N'icon-dashboard', 1, NULL)
+GO
+INSERT [dbo].[tblSiteUISideMenu] ([UISideMenuID], [OrganizationTypeID], [Header], [Navigationlink], [ClassStyle], [Order], [ParentSideMenuID]) VALUES (2, 1, N'Manage User Roles', N'/organization/manage-roles', N'icon-staffs-check', 2, NULL)
+GO
+INSERT [dbo].[tblSiteUISideMenu] ([UISideMenuID], [OrganizationTypeID], [Header], [Navigationlink], [ClassStyle], [Order], [ParentSideMenuID]) VALUES (3, 1, N'Manage Staff', N'null', N'icon-staffs-check', NULL, NULL)
+GO
+INSERT [dbo].[tblSiteUISideMenu] ([UISideMenuID], [OrganizationTypeID], [Header], [Navigationlink], [ClassStyle], [Order], [ParentSideMenuID]) VALUES (4, 1, N'Manage Permission', N'/organization/manage-permission', N'icon-user-setting', 6, NULL)
+GO
+INSERT [dbo].[tblSiteUISideMenu] ([UISideMenuID], [OrganizationTypeID], [Header], [Navigationlink], [ClassStyle], [Order], [ParentSideMenuID]) VALUES (5, 1, N'Invite Staff', N'/organization/manage-staff/invite-staff', N'icon-staffs-check', 4, 3)
+GO
+INSERT [dbo].[tblSiteUISideMenu] ([UISideMenuID], [OrganizationTypeID], [Header], [Navigationlink], [ClassStyle], [Order], [ParentSideMenuID]) VALUES (6, 1, N'Document Center', N'null', N'icon-staffs-check', NULL, NULL)
+GO
+INSERT [dbo].[tblSiteUISideMenu] ([UISideMenuID], [OrganizationTypeID], [Header], [Navigationlink], [ClassStyle], [Order], [ParentSideMenuID]) VALUES (7, 1, N'Document Listing', N'/organization/document-center/document-listing', N'icon-staffs-check', 5, 6)
+GO
+INSERT [dbo].[tblSiteUISideMenu] ([UISideMenuID], [OrganizationTypeID], [Header], [Navigationlink], [ClassStyle], [Order], [ParentSideMenuID]) VALUES (8, 1, N'View Staff', N'/organization/manage-staff/view-staff', N'icon-user', 3, NULL)
+GO
+INSERT [dbo].[tblSiteUISideMenu] ([UISideMenuID], [OrganizationTypeID], [Header], [Navigationlink], [ClassStyle], [Order], [ParentSideMenuID]) VALUES (9, 1, N'Manage Clinical Study', N'/organization/manage-clinical-trials', N'icon-user', 7, NULL)
+GO
+SET IDENTITY_INSERT [dbo].[tblSiteUISideMenu] OFF
+GO
+
+
+
+
+SET IDENTITY_INSERT [dbo].[tblSiteUISideMenuAction] ON 
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (1, 1, 1)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (2, 1, 2)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (3, 1, 3)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (4, 1, 4)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (5, 2, 1)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (6, 2, 2)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (7, 2, 3)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (8, 2, 4)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (9, 3, 1)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (10, 3, 2)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (11, 3, 3)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (12, 3, 4)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (13, 4, 1)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (14, 4, 2)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (15, 4, 3)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (16, 4, 4)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (17, 5, 1)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (18, 5, 2)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (19, 5, 3)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (20, 5, 4)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (21, 6, 1)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (22, 6, 2)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (23, 6, 3)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (24, 6, 4)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (25, 7, 1)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (26, 7, 2)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (27, 7, 3)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (28, 7, 4)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (29, 8, 1)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (30, 8, 2)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (31, 8, 3)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (32, 8, 4)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (33, 9, 1)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (34, 9, 2)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (35, 9, 3)
+GO
+INSERT [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID], [UISideMenuID], [ActionID]) VALUES (36, 9, 4)
+GO
+SET IDENTITY_INSERT [dbo].[tblSiteUISideMenuAction] OFF
+
+
+
+
+INSERT [dbo].[tblSiteAccountInvites] ([AccountInviteGuid], [OrganizationsID], [InviteAccept], [InviteSentBy], [InviteType], [EmailTemplateID], [IsBlocked], [IsActive], [IsDeleted], [DeletedBy], [DeletedOn], [CreatedBy], [CreatedOn], [ModifiedBy], [ModifiedOn], [InviteSentDate], [InvitedURL], [FirstName], [LastName], [EmailAddress], [InviteAcceptedDate], [IsStaff], [ChildOrganizationID], [InitialRoleID], [DepartmentName]) VALUES (N'0e2096f7-ed13-45b5-89cc-47fa669b054a', 109, 0, 0, 0, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, NULL, CAST(N'2022-02-23T23:53:15.1930000' AS DateTime2), N'superadmin/activation?key=fsOyNl90z3Ajn56q/7aKxYGw319c7CRw4P5B8eIkI1GQRKx+DABGX2idhxnNl+tTq9bMleKsUu2ft6clhTqMAtikKrJkJnVwwnSkyZWOtOX9LKyMiA1Cn5qaRddtrQa/', 0x01000000A57507D206CCF18C41D839190DA3FE1830E723BE9864C0FE86875BB8191FE19D, 0x0100000063A04EE6CA280D5AF9A19EF6974CEFCC750D572C1957B1F56577570AE19C80A9, 0x0100000062868B77C8756D27522B9B835E9B6B0B7DBDE0F3F1D52E0C132F1B322935D8D7EC6D657B4CED85B5824DD33F61958C4AEB3A42C4236A4EA47D261215BA4B918D, NULL, NULL, NULL, NULL, NULL)
+GO
+SET IDENTITY_INSERT [dbo].[tblSiteUsers] ON 
+GO
+INSERT [dbo].[tblSiteUsers] ([UserID], [AccountInviteGuid], [MacAddress], [TransactionCode], [IsActive], [IsBlocked], [InvalidAttempt], [PasswordExpirationDate], [LastLogin], [IsDeleted], [DeletedBy], [DeletedOn], [CreatedBy], [CreatedOn], [ModifiedBy], [ModifiedOn], [UserName], [UserPassword], [OrganizationID], [IsStaff], [ChildOrganizationID]) VALUES (97, N'0e2096f7-ed13-45b5-89cc-47fa669b054a', N'45.23.65.35', N'123456', 1, 0, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, 0x0100000074F2AE4F5F812D512E3E92664246EAEF51296C6F1A2437144713A9917BD54C16C96C5B2D9C54F9EC, 0x010000009395F08E51B4116DCAAED52A467B14F1EF057A7E3244BBAB1C577EDABA95E2A3A4F5A23D1B371CC5, 109, 0, NULL)
+GO
+SET IDENTITY_INSERT [dbo].[tblSiteUsers] OFF
+GO
+SET IDENTITY_INSERT [dbo].[tblSiteOrganization] ON 
+GO
+INSERT [dbo].[tblSiteOrganization] ([OrganizationID], [OrganizationGuid], [OrganizationName], [BusinessName], [SubDomainName], [LogoName], [FaviconName], [Address], [EmailAddress], [PrimaryContactNumber], [SecondaryContactNumber], [StateName], [CountryID], [OrganizationTypesId], [IsActive], [IsDeleted], [DeletedBy], [DeletedOn], [CreatedBy], [CreatedOn], [ModifiedBy], [ModifiedOn], [CityName]) VALUES (109, N'29516993-47be-4f19-9050-157d63fd6b4a', N'Alpha Organization ', N'Alpha Care Enterprise', N'Alpha LTD', N'', N'', N'New York', N'alphaCare@yopmail.com', N'8956236598', N'8956235689', N'Kentucky', 2, 1, 1, 0, NULL, NULL, NULL, NULL, NULL, NULL, N'Niagara')
+GO
+SET IDENTITY_INSERT [dbo].[tblSiteOrganization] OFF
+GO
+
+
+
+
+
+
+

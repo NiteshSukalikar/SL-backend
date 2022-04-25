@@ -1,0 +1,4713 @@
+/****** Object:  StoredProcedure [dbo].[USP_SiteUIGetMenuWithPermission]    Script Date: 2/23/2022 1:01:40 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- exec [dbo].[USP_SiteUIGetMenuWithPermission] 7
+--=============================================      
+Create PROCEDURE [dbo].[USP_SiteUIGetMenuWithPermission] 
+ @UserID bigint
+-- @ReturnCode NVARCHAR(20) OUTPUT
+--@AccountInviteToken uniqueidentifier  OUTPUT
+AS
+Declare @set_DomainId bigint;
+BEGIN
+    BEGIN TRAN
+    BEGIN TRY
+
+	BEGIN 
+	if(@UserID = 1)
+		BEGIN
+			select 
+			SM.UISideMenuID,
+			SM.Header,
+			COALESCE(SM.[Navigationlink],'') as Navigationlink,
+			SM.[ClassStyle],AC.ActionName as ActionName,
+			CAST(1 AS BIT) as HasAccess,
+			COALESCE(SM.[Order], 0) as [Order],
+			COALESCE(SM.ParentSideMenuID, 0)  as ParentSideMenuID 
+			
+			from [dbo].[tblSiteUISideMenu] SM
+			left join [dbo].[tblSiteUISideMenuAction] MA on SM.UISideMenuID=MA.UISideMenuID
+			left join  [dbo].[tblSiteUIAction] AC on MA.ActionID=AC.ActionID
+			where SM.OrganizationTypeID is null
+			 order by SM.UISideMenuID ASC
+		END		
+	 ELSE
+		BEGIN
+			
+
+			Declare @OrgType Bigint
+					set @OrgType = (select org.OrganizationTypesId FROM   [dbo].[tblSiteOrganization] org
+					join [dbo].[tblSiteUsers] us on org.OrganizationID=us.OrganizationID
+					where us.[UserID]=@UserID)
+
+		    Declare @IsStaffbit bit
+			set @IsStaffbit = (select [IsStaff] FROM   [dbo].[tblSiteUsers] where [UserID]=@UserID)
+
+
+			if (@IsStaffbit is  null OR @IsStaffbit = 0 )
+			 BEGIN
+					
+
+					select 
+						SM.UISideMenuID,
+						SM.Header,
+						COALESCE(SM.[Navigationlink],'') as Navigationlink,
+						SM.[ClassStyle],AC.ActionName as ActionName,
+						CAST(1 AS BIT) as HasAccess,
+						COALESCE(SM.[Order], 0) as [Order],
+						COALESCE(SM.ParentSideMenuID, 0)  as ParentSideMenuID
+							
+						from [dbo].[tblSiteUISideMenu] SM
+						left join [dbo].[tblSiteUISideMenuAction] MA on SM.UISideMenuID=MA.UISideMenuID
+						left join  [dbo].[tblSiteUIAction] AC on MA.ActionID=AC.ActionID
+					where SM.OrganizationTypeID = @OrgType
+					 order by SM.UISideMenuID ASC
+			 END
+			  Else
+			  BEGIN
+
+			  Declare @RoleID Bigint
+					set @RoleID = ( select[RoleID] from [dbo].[tblSiteUIChildUserRoleAssign] where [UserID]=@UserID )
+
+
+		select * from (
+						select 
+						SM.UISideMenuID,
+						SM.Header,
+						COALESCE(SM.[Navigationlink],'') as Navigationlink,
+						SM.[ClassStyle],AC.ActionName as ActionName,
+						ISNULL(RP.[HasAccess], 0) as HasAccess,
+						COALESCE(SM.[Order], 0) as [Order],
+						COALESCE(SM.ParentSideMenuID, 0)  as ParentSideMenuID,
+
+						MA.SideMenuActionID,
+						ISNULL(RP.RoleID, 0) as RoleID,
+						ISNULL(SM.OrganizationTypeID, 0) as OrganizationTypeID
+						
+
+						from [dbo].[tblSiteUISideMenuAction] MA 
+						left Join [dbo].[tblSiteUIRoleWiseSideMenuPermission] RP on MA.SideMenuActionID=RP.SideMenuActionID
+						join [dbo].[tblSiteUISideMenu] SM on SM.UISideMenuID=MA.UISideMenuID
+						join [dbo].[tblSiteUIAction] AC on MA.ActionID=AC.ActionID
+					 ) dd where dd.RoleID in(@RoleID,0) and dd.OrganizationTypeID = @OrgType order by dd.UISideMenuID ASC
+			 END
+		 END
+
+		 END
+        COMMIT TRAN
+
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRAN
+
+        DECLARE @ErrorMessage NVARCHAR(4000);
+        DECLARE @ErrorSeverity INT;
+        DECLARE @ErrorState INT;
+
+        SELECT @ErrorMessage = ERROR_MESSAGE(),
+               @ErrorSeverity = ERROR_SEVERITY(),
+               @ErrorState = ERROR_STATE();
+
+        RAISERROR(   @ErrorMessage,  -- Message text.
+                     @ErrorSeverity, -- Severity.
+                     @ErrorState     -- State.
+                 );
+    END CATCH;
+END
+
+
+
+
+/****** Object:  StoredProcedure [dbo].[USP_SiteSaveLogUserSystem]    Script Date: 2/23/2022 1:01:11 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- select * from [tblLogUserSystem]
+-- =============================================
+Create PROCEDURE [dbo].[USP_SiteSaveLogUserSystem]
+@SystemIPAddress nvarchar(255),
+@OrganizationsToken nvarchar(255),
+@SystemLocationAddress nvarchar(255),
+@UserId bigint,
+@UserLoggedInTime datetime,
+@LogUserCreatedOn datetime,
+@ReturnCode NVARCHAR(20) OUTPUT
+
+AS
+BEGIN
+BEGIN TRAN
+BEGIN TRY
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+	begin
+   INSERT INTO [dbo].[tblSiteLogUserSystem]
+           (SystemIPAddress
+           ,OrganizationsToken          
+           ,LogUserCreatedOn
+		   ,LogUserSystemGuid
+		   ,OrganizationsGuid
+		   )
+     VALUES
+           (@SystemIPAddress
+           ,@OrganizationsToken          
+           ,@LogUserCreatedOn
+		   ,NEWID(),
+		   NEWID())
+		   set @ReturnCode='200'
+		   end
+		 
+COMMIT TRAN
+END TRY
+BEGIN CATCH
+ROLLBACK TRAN
+
+    DECLARE @ErrorMessage NVARCHAR(4000);
+    DECLARE @ErrorSeverity INT;
+    DECLARE @ErrorState INT;
+
+    SELECT @ErrorMessage = ERROR_MESSAGE(),
+           @ErrorSeverity = ERROR_SEVERITY(),
+           @ErrorState = ERROR_STATE();
+    
+    RAISERROR (@ErrorMessage, -- Message text.
+               @ErrorSeverity, -- Severity.
+               @ErrorState -- State.
+               );
+END CATCH;
+END 
+
+
+
+
+/****** Object:  StoredProcedure [dbo].[USP_SiteGetUserDetailsForLogin]    Script Date: 2/23/2022 1:00:45 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+-- =============================================      
+-- Author:      <NiteshKumar>
+-- Create date: <04/06/2020>      
+-- Description: <Return user by email>      
+-- exec [dbo].[USP_GetUserDetailsForLogin] 'admin5'
+-- =============================================      
+Create PROCEDURE [dbo].[USP_SiteGetUserDetailsForLogin]     -- Return user by email or mobile number 
+@Email Nvarchar(max),
+@DomainId bigint 
+AS    
+BEGIN  
+BEGIN TRY
+
+		IF(@DomainId = 0)
+			BEGIN
+			SELECT
+			UD.UserID,
+			[dbo].[UDF_StringDecryptor](IV.EmailAddress) As EmailAddress,
+			[dbo].[UDF_StringDecryptor](UD.UserName) As UserName,
+			[dbo].[UDF_StringDecryptor](UD.UserPassword) As UserPassword,
+			[dbo].[UDF_StringDecryptor](IV.FirstName) as Firstname,
+			[dbo].[UDF_StringDecryptor](IV.LastName) as Lastname
+		   -- OG.[OrganizationTypesId]
+			from [dbo].[tblSiteUsers] UD
+			left join [dbo].[tblSiteAccountInvites] IV on IV.[AccountInviteGuid] = UD.[AccountInviteGuid]
+			left join [dbo].[tblSiteOrganization] OG on UD.OrganizationID= OG.OrganizationID
+
+			where  [dbo].[Udf_stringdecryptor](UD.UserName) = @Email and OG.[OrganizationTypesId] is null
+			and IV.IsActive = 1
+
+	
+			END
+			ELSE
+			BEGIN
+			
+			SELECT
+			UD.UserID,
+			[dbo].[UDF_StringDecryptor](IV.EmailAddress) As EmailAddress,
+			[dbo].[UDF_StringDecryptor](UD.UserName) As UserName,
+			[dbo].[UDF_StringDecryptor](UD.UserPassword) As UserPassword,
+			[dbo].[UDF_StringDecryptor](IV.FirstName) as Firstname,
+			[dbo].[UDF_StringDecryptor](IV.LastName) as Lastname
+		
+			from [dbo].[tblSiteUsers] UD
+			left join [dbo].[tblSiteAccountInvites] IV on IV.[AccountInviteGuid] = UD.[AccountInviteGuid]
+			left join [dbo].[tblSiteOrganization] OG on UD.OrganizationID= OG.OrganizationID
+
+			where  [dbo].[Udf_stringdecryptor](UD.UserName) = @Email and OG.[OrganizationTypesId] =@DomainId
+			and IV.IsActive = 1 and (IV.IsDeleted is null or IV.IsDeleted=0)
+
+		 	END
+   
+END TRY
+ BEGIN CATCH
+	SELECT
+	ERROR_NUMBER() AS ErrorNumber
+	,ERROR_SEVERITY() AS ErrorSeverity
+	,ERROR_STATE() AS ErrorState
+	,ERROR_PROCEDURE() AS ErrorProcedure
+	,ERROR_LINE() AS ErrorLine
+	,ERROR_MESSAGE() AS ErrorMessage;
+END CATCH
+END
+
+
+
+
+
+/****** Object:  StoredProcedure [dbo].[USP_SiteGetUserById]    Script Date: 2/23/2022 1:00:13 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================        
+-- Author:      <NiteshKumar Sukalikar>        
+-- Create date: <25/5/2020>        
+-- Description: <Return user by Id>     
+-- Select * from [dbo].[tblSiteAccountInvites]
+-- exec [dbo].[USP_SiteGetUserById] '5'     
+-- =============================================        
+Create PROCEDURE [dbo].[USP_SiteGetUserById] @Id nvarchar(max)  
+AS  
+BEGIN  
+  
+  IF (@Id = 0)  
+  BEGIN  
+    RETURN  
+  END  
+  ELSE  
+  BEGIN  
+   -- SELECT  
+   --   UD.UserID AS UserId,  
+   --[dbo].[UDF_StringDecryptor](UP.FirstName) As FirstName,   
+   --[dbo].[UDF_StringDecryptor](UP.LastName) As LastName,  
+   --[dbo].[UDF_StringDecryptor](UP.EmailAddress) As EmailAddress,   
+   --[dbo].[UDF_StringDecryptor](UP.PrimaryContactNumber) As ContactNumber,   
+   --[dbo].[UDF_StringDecryptor](UD.UserName) As UserName,   
+   --[dbo].[UDF_StringDecryptor](UD.UserPassword) As UserPassword  
+   -- FROM [dbo].[tblUsers] UD  
+   -- JOIN [dbo].[tblUserProfiles] UP  
+   --   ON UP.UserID = UD.UserID  
+   -- WHERE UD.UserID = @Id  
+  
+ SELECT  
+   UD.UserID,  
+   [dbo].[UDF_StringDecryptor](IV.EmailAddress) As EmailAddress,  
+   '' As ContactNumber,  
+   [dbo].[UDF_StringDecryptor](UD.UserName) As UserName,  
+   [dbo].[UDF_StringDecryptor](UD.UserPassword) As UserPassword,  
+   [dbo].[UDF_StringDecryptor](IV.FirstName) as FirstName,  
+   [dbo].[UDF_StringDecryptor](IV.LastName) as LastName,
+   OG.OrganizationID ,
+   IV.IsStaff,
+   IV.[AccountInviteGuid] as AccountId,
+   UP.[ProfilePicture] as ProfilePicture,
+   OG.LogoName as LogoName
+     -- OG.[OrganizationTypesId]  
+   from [dbo].[tblSiteUsers] UD  
+   left join [dbo].[tblSiteAccountInvites] IV on IV.[AccountInviteGuid] = UD.[AccountInviteGuid]  
+   left join [dbo].[tblSiteOrganization] OG on UD.OrganizationID= OG.OrganizationID  
+   left join [dbo].[tblSiteUserProfiles] UP on UP.UserID = @Id 
+   WHERE UD.UserID = @Id  
+  END  
+END  
+  
+  
+  
+  
+/****** Object:  StoredProcedure [dbo].[USP_SiteUIGetMenuWithPermissionForRole]    Script Date: 2/23/2022 2:10:23 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- exec [dbo].[USP_UIGetMenuWithPermission] 24
+-- =============================================      
+Create PROCEDURE [dbo].[USP_SiteUIGetMenuWithPermissionForRole] 
+ @RoleID bigint
+-- @ReturnCode NVARCHAR(20) OUTPUT
+	--@AccountInviteToken uniqueidentifier  OUTPUT
+AS
+Declare @set_DomainId bigint;
+BEGIN
+    BEGIN TRAN
+    BEGIN TRY
+
+	BEGIN 
+
+		Declare @OrgType Bigint
+					set @OrgType = (select  OG.OrganizationTypesId  from  [dbo].[tblSiteOrganizationMapRole] UR
+					join [dbo].[tblSiteUsers] US on UR.UserID=US.[UserID]
+					join [dbo].[tblSiteOrganization] OG on US.[OrganizationID]=OG.[OrganizationID]
+					where UR.RoleID=@RoleID)
+IF NOT EXISTS  
+            (  
+                SELECT top 1  * from [dbo].[tblSiteUIRoleWiseSideMenuPermission] where  [RoleID] =@RoleID
+            )  
+			BEGIN 
+			select * from (
+						select 
+						SM.UISideMenuID,
+						SM.Header,
+						COALESCE(SM.[Navigationlink],'') as Navigationlink,
+						SM.[ClassStyle],AC.ActionName as ActionName,
+						MA.[SideMenuActionID] as MenuActionID,
+						0 as HasAccess,
+						COALESCE(SM.[Order], 0) as [Order],
+						COALESCE(SM.ParentSideMenuID, 0)  as ParentSideMenuID,
+
+						ISNULL(@RoleID, 0) as RoleID,
+						ISNULL(SM.OrganizationTypeID, 0) as OrganizationTypeID
+						
+
+						from [dbo].[tblSiteUISideMenuAction] MA 
+					--	left Join [dbo].[tblUIRoleWiseSideMenuPermission] RP on MA.SideMenuActionID=RP.SideMenuActionID
+						join [dbo].[tblSiteUISideMenu] SM on SM.UISideMenuID=MA.UISideMenuID
+						join [dbo].[tblSiteUIAction] AC on MA.ActionID=AC.ActionID
+					 ) dd where  dd.OrganizationTypeID = @OrgType order by dd.UISideMenuID ASC
+
+					  END  
+  
+  ELSE   
+  BEGIN    
+  select * from (
+						select 
+						SM.UISideMenuID,
+						SM.Header,
+						COALESCE(SM.[Navigationlink],'') as Navigationlink,
+						SM.[ClassStyle],AC.ActionName as ActionName,
+						MA.[SideMenuActionID] as MenuActionID,
+						ISNULL(RP.[HasAccess], 0) as HasAccess,
+						COALESCE(SM.[Order], 0) as [Order],
+						COALESCE(SM.ParentSideMenuID, 0)  as ParentSideMenuID,
+
+						ISNULL(RP.RoleID, 0) as RoleID,
+						ISNULL(SM.OrganizationTypeID, 0) as OrganizationTypeID
+						
+
+						from [dbo].[tblSiteUISideMenuAction] MA 
+						left Join [dbo].[tblSiteUIRoleWiseSideMenuPermission] RP on MA.SideMenuActionID=RP.SideMenuActionID
+						join [dbo].[tblSiteUISideMenu] SM on SM.UISideMenuID=MA.UISideMenuID
+						join [dbo].[tblSiteUIAction] AC on MA.ActionID=AC.ActionID
+					 ) dd where dd.RoleID in(@RoleID,0) and dd.OrganizationTypeID = @OrgType order by dd.UISideMenuID ASC
+
+  END
+		 END
+        COMMIT TRAN
+
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRAN
+
+        DECLARE @ErrorMessage NVARCHAR(4000);
+        DECLARE @ErrorSeverity INT;
+        DECLARE @ErrorState INT;
+
+        SELECT @ErrorMessage = ERROR_MESSAGE(),
+               @ErrorSeverity = ERROR_SEVERITY(),
+               @ErrorState = ERROR_STATE();
+
+        RAISERROR(   @ErrorMessage,  -- Message text.
+                     @ErrorSeverity, -- Severity.
+                     @ErrorState     -- State.
+                 );
+    END CATCH;
+END
+
+
+
+
+
+/****** Object:  UserDefinedTableType [dbo].[tmpPermissionEntry]    Script Date: 2/23/2022 2:16:18 PM ******/
+CREATE TYPE [dbo].[tmpSitePermissionEntry] AS TABLE(
+	[SideMenuActionID] [bigint] NULL,
+	[RoleId] [bigint] NULL,
+	[IsTrue] [bit] NULL
+)
+GO
+
+
+/****** Object:  StoredProcedure [dbo].[USP_SitePermissionEntry]    Script Date: 2/23/2022 2:09:51 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+Create PROCEDURE [dbo].[USP_SitePermissionEntry]
+ @ChildMastertemp tmpSitePermissionEntry readonly,
+
+ @ReturnCode NVARCHAR(20) OUTPUT
+ --@IsSuccessful bit OUTPUT
+AS
+
+BEGIN
+    BEGIN TRAN
+    BEGIN TRY
+       
+        SET NOCOUNT ON;
+		
+		Declare @Role Bigint
+					set @Role = (select top 1 RoleID from @ChildMastertemp)
+
+	
+		 BEGIN 
+
+		 delete from [dbo].[tblSiteUIRoleWiseSideMenuPermission] where [RoleID]=@Role
+
+		 INSERT INTO [dbo].[tblSiteUIRoleWiseSideMenuPermission]
+           (  
+		     [SideMenuActionID],
+		      [RoleID],
+			  [HasAccess]
+		   )
+		  select [SideMenuActionID],RoleID, IsTrue from @ChildMastertemp
+  
+			set @ReturnCode = '200'
+		  --set @IsSuccessful=1
+			END
+
+        COMMIT TRAN
+
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRAN
+
+        DECLARE @ErrorMessage NVARCHAR(4000);
+        DECLARE @ErrorSeverity INT;
+        DECLARE @ErrorState INT;
+
+        SELECT @ErrorMessage = ERROR_MESSAGE(),
+               @ErrorSeverity = ERROR_SEVERITY(),
+               @ErrorState = ERROR_STATE();
+
+        RAISERROR(   @ErrorMessage,  -- Message text.
+                     @ErrorSeverity, -- Severity.
+                     @ErrorState     -- State.
+                 );
+    END CATCH;
+END
+
+
+
+
+
+/****** Object:  StoredProcedure [dbo].[USP_SiteGetMenuActionList]    Script Date: 2/23/2022 2:09:21 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+   
+-- =============================================      
+Create PROCEDURE [dbo].[USP_SiteGetMenuActionList] 
+	@UserID Bigint
+AS
+BEGIN
+if(@UserID=1)
+Begin
+select  SM.UISideMenuID,SM.Header,COALESCE(SM.[Navigationlink],'') as Navigationlink,SM.ClassStyle,AC.[ActionName] ,SA.[SideMenuActionID] as MenuActionID,
+		--(select Header from [dbo].[tblUISideMenu] where UISideMenuID = SM.ParentSideMenuID) as ParentSideMenuID,
+	    COALESCE(SM.[Order], 0) as [Order],COALESCE(SM.ParentSideMenuID, 0) as ParentSideMenuID from[dbo].[tblSiteUISideMenuAction] SA 
+		join [dbo].[tblSiteUIAction] AC on SA.ActionID=AC.ActionID
+		join [dbo].[tblSiteUISideMenu] SM on SA.UISideMenuID=SM.UISideMenuID
+	where SM.OrganizationTypeID is null
+End
+else
+BEGIN
+		Declare @OrgType Bigint
+					set @OrgType = (select org.OrganizationTypesId FROM   [dbo].[tblSiteOrganization] org
+					join [dbo].[tblSiteUsers] us on org.OrganizationID=us.OrganizationID
+					where us.[UserID]=@UserID)
+
+  BEGIN
+	select  SM.UISideMenuID,SM.Header,COALESCE(SM.[Navigationlink],'') as Navigationlink,SM.ClassStyle,AC.[ActionName] ,SA.[SideMenuActionID] as MenuActionID,
+		--(select Header from [dbo].[tblUISideMenu] where UISideMenuID = SM.ParentSideMenuID) as ParentSideMenuID,
+		COALESCE(SM.[Order], 0) as [Order],COALESCE(SM.ParentSideMenuID, 0) as ParentSideMenuID from[dbo].[tblUISideMenuAction] SA 
+		join [dbo].[tblSiteUIAction] AC on SA.ActionID=AC.ActionID
+		join [dbo].[tblSiteUISideMenu] SM on SA.UISideMenuID=SM.UISideMenuID
+	where SM.OrganizationTypeID = @OrgType
+  END
+  END
+END
+
+
+
+
+
+/****** Object:  StoredProcedure [dbo].[USP_SiteGetStateListCountrywise]    Script Date: 2/23/2022 2:08:55 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================        
+-- Author:      <Nitesh kumar>        
+-- UpdatedBy : <Nitesh Kumar>  
+-- Create date: <22/12/2021>    
+-- exec [dbo].[USP_SiteGetStateListCountrywise] 2
+
+-- =============================================        
+Create PROCEDURE [dbo].[USP_SiteGetStateListCountrywise]        
+@ID bigint
+AS    
+BEGIN  
+BEGIN TRY
+	 BEGIN   
+		select [ID] as stateId ,[Name] as stateName,[CountryID] as countryId from [dbo].[tblSiteMasterState] where [CountryID]= @ID  ORDER BY [Name] ASC;
+	 END 
+END TRY
+ BEGIN CATCH
+	SELECT
+	ERROR_NUMBER() AS ErrorNumber
+	,ERROR_SEVERITY() AS ErrorSeverity
+	,ERROR_STATE() AS ErrorState
+	,ERROR_PROCEDURE() AS ErrorProcedure
+	,ERROR_LINE() AS ErrorLine
+	,ERROR_MESSAGE() AS ErrorMessage;
+END CATCH
+END
+
+
+
+
+/****** Object:  StoredProcedure [dbo].[USP_SiteGetCityListStatewise]    Script Date: 2/23/2022 2:08:34 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================        
+-- Author:      <NiteshKumar>        
+-- UpdatedBy : <Niteshkumar>  
+-- Create date: <20/5/2020>    
+-- exec [dbo].[USP_SiteGetCityListStatewise] 7
+-- =============================================        
+Create PROCEDURE [dbo].[USP_SiteGetCityListStatewise]        
+@Id bigint
+AS    
+BEGIN  
+BEGIN TRY
+	 BEGIN   
+		select [ID] as cityId ,[Name] as cityName,[StateID] as stateId from [dbo].[tblSiteMasterCity] where [StateID]= @ID
+	 END 
+END TRY
+ BEGIN CATCH
+	SELECT
+	ERROR_NUMBER() AS ErrorNumber
+	,ERROR_SEVERITY() AS ErrorSeverity
+	,ERROR_STATE() AS ErrorState
+	,ERROR_PROCEDURE() AS ErrorProcedure
+	,ERROR_LINE() AS ErrorLine
+	,ERROR_MESSAGE() AS ErrorMessage;
+END CATCH
+END
+
+
+
+
+/****** Object:  StoredProcedure [dbo].[USP_SiteGetCountryList]    Script Date: 2/23/2022 2:08:17 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================        
+-- Author:      <Sarang Sarode>        
+-- UpdatedBy : <Kunal Burangi>  
+-- Create date: <20/5/2020>        
+-- Description: <Return user by email>        
+-- exec [dbo].[USP_SiteGetUserByEmail] 'Qxy2AcEJzKN+tk4jT6OaJBaMSfISuSoi5ts07O+d0k4='   
+-- select * from [dbo].[tbl_SiteUserDetails]
+-- select * from tbl_SiteOrganizationMaster
+-- =============================================        
+Create PROCEDURE [dbo].[USP_SiteGetCountryList]        
+--@Email Nvarchar(max)
+AS    
+BEGIN  
+BEGIN TRY
+
+	 BEGIN   
+		select [ID] as countryId,[Name] as countryName,[CountryCode] as countryCode from [dbo].[tblSiteMasterCountry]
+	 END 
+   
+END TRY
+ BEGIN CATCH
+	SELECT
+	ERROR_NUMBER() AS ErrorNumber
+	,ERROR_SEVERITY() AS ErrorSeverity
+	,ERROR_STATE() AS ErrorState
+	,ERROR_PROCEDURE() AS ErrorProcedure
+	,ERROR_LINE() AS ErrorLine
+	,ERROR_MESSAGE() AS ErrorMessage;
+END CATCH
+END
+
+
+
+
+/****** Object:  StoredProcedure [dbo].[USP_SiteGetFolderPath]    Script Date: 2/23/2022 2:23:19 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+    
+Create PROCEDURE [dbo].[USP_SiteGetFolderPath]
+ 
+ @UserID int,
+ @fullpath NVARCHAR(500) OUTPUT
+AS
+BEGIN  
+ IF (@UserID is not NULL)
+  BEGIN
+	DECLARE @var1 VARCHAR(50)
+	DECLARE @var2 VARCHAR(50)
+	DECLARE @var3 VARCHAR(50)
+   select 
+	@var1=CASE 
+		WHEN  o.OrganizationTypesId=2 then 'Sponsor'
+		WHEN  o.OrganizationTypesId=4 then 'CRO'
+		WHEN  o.OrganizationTypesId=3 then 'PI'
+		ELSE 'Organization' end ,
+		@var2=o.OrganizationGuid,@var3=u.AccountInviteGuid 
+from [dbo].[tblSiteUsers] u join tblSiteOrganization o on u.OrganizationID=o.OrganizationID
+where UserID=@UserID
+
+set @fullpath = @var1+'/'+@var2+'/'+ @var3+'/file'
+  END
+  
+  
+END
+
+
+
+
+/****** Object:  StoredProcedure [dbo].[USP_SiteGetExistingDocumentTitlesById]    Script Date: 2/23/2022 2:22:59 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+Create PROCEDURE [dbo].[USP_SiteGetExistingDocumentTitlesById] @Id int     
+   
+AS  
+BEGIN    
+   -- SET NOCOUNT ON added to prevent extra result sets from  
+ -- interfering with SELECT statements.  
+ SET NOCOUNT ON;  
+  
+Select distinct  
+dc.DocumentTitle,   
+dc.DocumentCenterId  
+ from [dbo].[tblSiteDocumentCenterFile] dcf  
+ join [dbo].[tblSiteDocumentCenter] dc on dcf.DocumentCenterId=dc.DocumentCenterId  
+ join [dbo].[tblSiteUsers] u on dcf.CreatedBy=u.UserID  
+    join [dbo].[tblSiteAccountInvites] i on u.AccountInviteGuid=i.AccountInviteGuid  
+ where dcf.CreatedBy=@Id  
+END  
+  
+  
+  
+  
+  
+/****** Object:  StoredProcedure [dbo].[USP_SiteGetDocumentById]    Script Date: 2/23/2022 2:22:41 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- exec [dbo].[USP_GetDocumentById] 5
+
+Create PROCEDURE [dbo].[USP_SiteGetDocumentById]
+    @Id int,
+    @Search nvarchar(max)
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+    SET NOCOUNT ON;
+
+    IF (@Search is NULL OR @Search = '')
+    BEGIN
+        Select dc.DocumentTitle,
+               Isnull([dbo].[UDF_StringDecryptor](i.FirstName), '') + ' '
+               + ISNULL([dbo].[UDF_StringDecryptor](i.LastName), '') As UploadedBy,
+               dcf.DocumentCenterId,
+               dcf.DocumentCenterFileId,
+               dcf.DocumentCenterFileCommentText as Comment,
+               dcf.DocumentCenterOriginalFileName as OrigionalFileName,
+               dcf.CreatedBy as [UploadedBy],
+               dcf.DocumentCenterFileExtension as [DocumentType],
+               dcf.DocumentCenterFileDownloadLink as [FileDownloadLink],
+               dcf.DocumentCenterFileUploadedDate as [UploadedDate],
+               ROW_NUMBER() over (partition by dcf.DocumentCenterId
+                                  order by dcf.DocumentCenterFileUploadedDate asc
+                                 ) as DocumentVersion
+        from [dbo].[tblSiteDocumentCenterFile] dcf
+            join [dbo].[tblSiteDocumentCenter] dc
+                on dcf.DocumentCenterId = dc.DocumentCenterId
+            join [dbo].[tblSiteUsers] u
+                on dcf.CreatedBy = u.UserID
+            join [dbo].[tblSiteAccountInvites] i
+                on u.AccountInviteGuid = i.AccountInviteGuid
+        where dcf.CreatedBy = @Id
+        order by DocumentCenterFileId DESC
+    END
+    ELSE
+    BEGIN
+
+        Select dc.DocumentTitle,
+               Isnull([dbo].[UDF_StringDecryptor](i.FirstName), '') + ' '
+               + ISNULL([dbo].[UDF_StringDecryptor](i.LastName), '') As UploadedBy,
+               dcf.DocumentCenterId,
+               dcf.DocumentCenterFileId,
+               dcf.DocumentCenterFileCommentText as Comment,
+               dcf.DocumentCenterOriginalFileName as OrigionalFileName,
+               dcf.CreatedBy as [UploadedBy],
+               dcf.DocumentCenterFileExtension as [DocumentType],
+               dcf.DocumentCenterFileDownloadLink as [FileDownloadLink],
+               dcf.DocumentCenterFileUploadedDate as [UploadedDate],
+               ROW_NUMBER() over (partition by dcf.DocumentCenterId
+                                  order by dcf.DocumentCenterFileUploadedDate asc
+                                 ) as DocumentVersion
+        from [dbo].[tblSiteDocumentCenterFile] dcf
+            join [dbo].[tblSiteDocumentCenter] dc
+                on dcf.DocumentCenterId = dc.DocumentCenterId
+            join [dbo].[tblSiteUsers] u
+                on dcf.CreatedBy = u.UserID
+            join [dbo].[tblSiteAccountInvites] i
+                on u.AccountInviteGuid = i.AccountInviteGuid
+        where dcf.CreatedBy = @Id
+              And (dc.DocumentTitle LIKE '%' + @Search + '%')
+        order by DocumentCenterFileId DESC
+    END
+
+END
+
+
+
+
+
+/****** Object:  StoredProcedure [dbo].[USP_SiteAddDocument]    Script Date: 2/23/2022 2:21:56 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================  
+-- Author:  <Author,,Name>  
+-- Create date: <Create Date,,>  
+-- Description: <Description,,>  
+-- =============================================  
+Create PROCEDURE [dbo].[USP_SiteAddDocument]  
+
+    @DocumentTitle nvarchar(250), 
+	@DropdownDocID bigint = NULL, 
+
+    @DocumentCenterGUID uniqueidentifier,  
+    @DocumentCenterFileGUID uniqueidentifier,  
+    @DocumentCenterOriginalFileName nvarchar(250),  
+    @DocumentCenterSaveFileName nvarchar(250),  
+	@DocumentCenterFileExtension varchar(10),  
+	@DocumentCenterFileVersion decimal(2,1),  
+	@DocumentCenterFileUploadedBy int,  
+	@DocumentCenterFileCommentText varchar(1000),  
+    @DocumentCenterFileDownloadLink nvarchar(500),  
+    @IsActive bit = 1,  
+    @IsDeleted bit = 0, 
+	@CreatedBy bigint,
+    @ReturnCode NVARCHAR(20) OUTPUT,  
+    @DocumentCenterId bigint OUTPUT,  
+    @DocumentCenterFileId bigint OUTPUT 
+	
+	 
+		 --@DocumentCenterId bigint  
+		 --@DocumentCenterFileUploadedDate  
+		 --@DeletedBy bigint,  
+		 --@DeletedOn date,    
+		 --@CreatedOn date,  
+		 --@ModifiedBy bigint,  
+		 --@ModifiedOn date,  
+  
+AS  
+BEGIN  
+   BEGIN TRAN  
+   BEGIN TRY       
+        SET NOCOUNT ON;    
+    
+     BEGIN   
+	    Declare @IsDocTitleExist  bit=0
+        Declare @DocCenID bigint=NULL; 
+		SET @DocCenID = @DropdownDocID
+		IF (@DocCenID is  null OR @DocCenID =0)  
+			 BEGIN  
+				IF (@DocumentTitle IS NOT NULL AND EXISTS(SELECT 1 FROM dbo.[tblSiteDocumentCenter] WITH(NOLOCK) WHERE UPPER(DocumentTitle) =UPPER(@DocumentTitle)))
+			BEGIN
+			    set @IsDocTitleExist=1
+			END
+			ELSE
+			BEGIN
+				INSERT INTO [dbo].[tblSiteDocumentCenter]  
+				(      
+				    [DocumentCenterGUID],  
+				    [DocumentTitle],  
+				    [IsActive],  
+				    [IsDeleted],  
+				    [CreatedBy],  
+				    [CreatedOn]            
+				)  
+				VALUES  
+				(  
+				 @DocumentCenterGUID,  
+				 @DocumentTitle,  
+				 @IsActive,  
+				 @IsDeleted,  
+				 @CreatedBy,  
+				 GETDATE()       
+				)  
+          set @DocCenID=SCOPE_IDENTITY()  
+				END
+		     END   
+      END  
+  
+   IF (@DocCenID is not null AND @IsDocTitleExist <> 1)  
+   BEGIN  
+    INSERT INTO [dbo].[tblSiteDocumentCenterFile]  
+            (      
+                [DocumentCenterFileGUID],  
+                [DocumentCenterOriginalFileName],  
+				[DocumentCenterSaveFileName],  
+				[DocumentCenterFileExtension],  
+				[DocumentCenterFileVersion],  
+				[DocumentCenterFileUploadedBy],  
+				[DocumentCenterFileUploadedDate],  
+				[DocumentCenterFileCommentText],  
+				[DocumentCenterId],  
+				[DocumentCenterFileDownloadLink],  
+                [IsActive],  
+                [IsDeleted],             
+                [CreatedBy],  
+                [CreatedOn]  
+            )  
+            VALUES  
+            (  
+             @DocumentCenterFileGUID,  
+             @DocumentCenterOriginalFileName,  
+			 @DocumentCenterSaveFileName,  
+			 @DocumentCenterFileExtension,  
+			 @DocumentCenterFileVersion,  
+			 @DocumentCenterFileUploadedBy,  
+			 GETDATE(),  
+			 @DocumentCenterFileCommentText,  
+			 @DocCenID,  
+			 @DocumentCenterFileDownloadLink,  
+             @IsActive,  
+             @IsDeleted,  
+             @CreatedBy,  
+             GETDATE()          
+            )  
+   set @DocumentCenterId = @DocCenID  
+   set @DocumentCenterFileId=SCOPE_IDENTITY()  
+   set @ReturnCode = '200'  
+   END  
+   ELSE
+   BEGIN
+    set @DocumentCenterId=0
+    set @DocumentCenterFileId=0
+    set @ReturnCode = '201'  
+   END
+  
+    
+ COMMIT TRAN    
+    
+    END TRY    
+    BEGIN CATCH    
+        ROLLBACK TRAN    
+    
+        DECLARE @ErrorMessage NVARCHAR(4000);    
+        DECLARE @ErrorSeverity INT;    
+        DECLARE @ErrorState INT;    
+    
+        SELECT @ErrorMessage = ERROR_MESSAGE(),    
+               @ErrorSeverity = ERROR_SEVERITY(),    
+               @ErrorState = ERROR_STATE();    
+    
+        RAISERROR(   @ErrorMessage,  -- Message text.    
+                     @ErrorSeverity, -- Severity.    
+                     @ErrorState     -- State.    
+                 );    
+    END CATCH;    
+END    
+
+
+/****** Object:  StoredProcedure [dbo].[USP_SiteAddMasterRoles]    Script Date: 2/23/2022 6:29:21 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+
+-- exec [dbo].[USP_SiteAddMasterRoles] 'Test','Test',5,200
+-- =============================================
+Create PROCEDURE [dbo].[USP_SiteAddMasterRoles]
+    @RoleName nvarchar(200),
+    @RoleDescription nvarchar(max),
+    @UserID bigint,
+    @ReturnCode NVARCHAR(20) OUTPUT
+AS
+BEGIN
+    BEGIN TRAN
+    BEGIN TRY
+
+        BEGIN
+            INSERT INTO [dbo].[tblSiteMasterRoles]
+            (
+                RoleGuid,
+                RoleName,
+                RoleDescription,
+                IsActive,
+                IsDeleted
+            )
+            VALUES
+            (NEWID(), @RoleName, @RoleDescription, 1, 0)
+            set @ReturnCode = '200'
+            Declare @RoleID bigint;
+            set @RoleID = SCOPE_IDENTITY();
+            if (@RoleID is not null)
+            BEGIN
+                INSERT INTO [dbo].[tblSiteOrganizationMapRole]
+                (
+                    [UserID],
+                    [RoleID]
+                )
+                VALUES
+                (@UserID, @RoleID)
+                set @ReturnCode = '200'
+            END
+            set @ReturnCode = '200'
+        END
+        COMMIT TRAN
+
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRAN
+
+        DECLARE @ErrorMessage NVARCHAR(4000);
+        DECLARE @ErrorSeverity INT;
+        DECLARE @ErrorState INT;
+
+        SELECT @ErrorMessage = ERROR_MESSAGE(),
+               @ErrorSeverity = ERROR_SEVERITY(),
+               @ErrorState = ERROR_STATE();
+
+        RAISERROR(   @ErrorMessage,  -- Message text.
+                     @ErrorSeverity, -- Severity.
+                     @ErrorState     -- State.
+                 );
+    END CATCH;
+END
+
+
+
+/****** Object:  StoredProcedure [dbo].[USP_SiteGetUserRole]    Script Date: 2/23/2022 6:28:50 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================      
+-- Author:      <NiteshKumar Sukalikar>      
+-- Create date: <25/5/2020>      
+-- Description: <Return user by Id>      
+-- =============================================      
+Create PROCEDURE [dbo].[USP_SiteGetUserRole] @Id bigint
+AS
+BEGIN
+
+  IF (@Id = 0)
+  BEGIN
+    RETURN
+  END
+  ELSE
+  BEGIN
+    SELECT
+      RoleID,
+	  RoleGuid,
+	  RoleName,
+	  RoleDescription,
+	  IsActive,
+	  IsDeleted
+    FROM [dbo].[tblSiteMasterRoles] 
+    WHERE RoleID = @Id and IsActive = 1
+  END
+END
+
+
+
+
+/****** Object:  StoredProcedure [dbo].[USP_SiteGetMasterRole]    Script Date: 2/23/2022 6:28:23 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================       
+
+-- Create date: <20/5/2020>        
+-- Description: <Return user by email>        
+-- exec [dbo].[USP_SiteGetMasterRole] '5'
+-- =============================================        
+Create PROCEDURE [dbo].[USP_SiteGetMasterRole]        
+@UserID bigint
+AS    
+BEGIN  
+BEGIN TRY
+
+	 BEGIN   
+	 select MR.RoleID, MR.RoleName,MR.RoleDescription from  [dbo].[tblSiteOrganizationMapRole] OMP
+	 join [dbo].[tblSiteMasterRoles] MR on  OMP.RoleID=MR.RoleID
+	 where OMP.UserID=@UserID and MR.IsActive = 1
+	 END 
+
+END TRY
+ BEGIN CATCH
+	SELECT
+	ERROR_NUMBER() AS ErrorNumber
+	,ERROR_SEVERITY() AS ErrorSeverity
+	,ERROR_STATE() AS ErrorState
+	,ERROR_PROCEDURE() AS ErrorProcedure
+	,ERROR_LINE() AS ErrorLine
+	,ERROR_MESSAGE() AS ErrorMessage;
+END CATCH
+END
+
+
+
+/****** Object:  StoredProcedure [dbo].[USP_SiteUpdateUserRoles]    Script Date: 2/23/2022 6:30:18 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+Create PROCEDURE [dbo].[USP_SiteUpdateUserRoles]
+@RoleID bigint,
+@RoleName nvarchar(200),
+@RoleDescription nvarchar(max),
+@ReturnCode NVARCHAR(20) OUTPUT
+AS
+BEGIN
+BEGIN TRAN
+BEGIN TRY
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+		BEGIN
+
+   Update [dbo].tblSiteMasterRoles
+   SET	    RoleName = @RoleName 
+		   ,RoleDescription = @RoleDescription 
+    WHERE  RoleID = @RoleID
+    set @ReturnCode='200'
+
+		END
+		 
+COMMIT TRAN
+END TRY
+BEGIN CATCH
+ROLLBACK TRAN
+
+    DECLARE @ErrorMessage NVARCHAR(4000);
+    DECLARE @ErrorSeverity INT;
+    DECLARE @ErrorState INT;
+
+    SELECT @ErrorMessage = ERROR_MESSAGE(),
+           @ErrorSeverity = ERROR_SEVERITY(),
+           @ErrorState = ERROR_STATE();
+    
+    RAISERROR (@ErrorMessage, -- Message text.
+               @ErrorSeverity, -- Severity.
+               @ErrorState -- State.
+               );
+END CATCH;
+END 
+
+
+
+
+/****** Object:  StoredProcedure [dbo].[USP_SiteDeleteUserRole]    Script Date: 2/23/2022 6:30:47 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+Create PROCEDURE [dbo].[USP_SiteDeleteUserRole]
+@RoleID bigint,
+@ReturnCode NVARCHAR(20) OUTPUT
+AS
+BEGIN
+BEGIN TRAN
+BEGIN TRY
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+		BEGIN
+
+   Update  [dbo].tblSiteMasterRoles
+   SET	   IsDeleted = 1 , IsActive = 0
+   where   RoleID = @RoleID
+		  
+
+   Update [dbo].[tblSiteUIChildUserRoleAssign]
+   SET RoleID = Null
+   Where RoleID = @RoleID
+
+    set @ReturnCode='200'
+
+		END
+		 
+COMMIT TRAN
+END TRY
+BEGIN CATCH
+ROLLBACK TRAN
+
+    DECLARE @ErrorMessage NVARCHAR(4000);
+    DECLARE @ErrorSeverity INT;
+    DECLARE @ErrorState INT;
+
+    SELECT @ErrorMessage = ERROR_MESSAGE(),
+           @ErrorSeverity = ERROR_SEVERITY(),
+           @ErrorState = ERROR_STATE();
+    
+    RAISERROR (@ErrorMessage, -- Message text.
+               @ErrorSeverity, -- Severity.
+               @ErrorState -- State.
+               );
+END CATCH;
+END 
+
+
+
+
+
+/****** Object:  StoredProcedure [dbo].[USP_SiteAddAccountInvites]    Script Date: 2/23/2022 6:41:36 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+  
+Create PROCEDURE [dbo].[USP_SiteAddAccountInvites]  
+    @OrganizationsID bigint,  
+	@ChildOrganizationsID bigint = null,  
+    @FirstName nvarchar(200),  
+    @LastName nvarchar(200),  
+	@DepartmentName nvarchar(200) = null,
+    @EmailAddress nvarchar(200),
+	@InitialRoleID bigint = null,  
+	@IsStaff bit,  
+    --@InviteDate datetime,  
+
+    @ReturnCode NVARCHAR(20) OUTPUT,  
+    @AccountInviteToken uniqueidentifier OUTPUT,
+	@OrganizationType bigint   OUTPUT
+AS  
+Declare @SubId bigint;  
+BEGIN  
+    BEGIN TRAN  
+    BEGIN TRY  
+        -- SET NOCOUNT ON added to prevent extra result sets from  
+        -- interfering with SELECT statements.  
+        if object_id('tempdb..##tempMapInvites', 'U') is not null  
+            drop table ##tempMapInvites  
+        SET NOCOUNT ON;  
+  
+
+   IF NOT EXISTS  
+            (  
+                SELECT top 1  
+                    *  
+               from tblSiteAccountInvites  where [dbo].[UDF_StringDecryptor](EmailAddress) = @EmailAddress and IsActive = 1
+            )  
+  
+        BEGIN  
+    Declare @newGuid as uniqueidentifier;  
+    set @newGuid=NEWID();  
+            INSERT INTO [dbo].[tblSiteAccountInvites]  
+            (  
+                [AccountInviteGuid],  
+                [FirstName],  
+                [LastName],  
+                [EmailAddress],
+				[DepartmentName],
+                [OrganizationsID],  
+                [InviteAccept],      
+                [InviteSentBy],  
+                [InviteType],  
+                [InviteSentDate],				
+				[IsStaff],  
+				[IsActive],
+				[IsDeleted],
+				[InitialRoleID],
+				[ChildOrganizationID]
+			)  
+			VALUES  
+			(   
+				@newGuid,  
+				[dbo].[Udf_stringEncryptor](@FirstName),  
+				[dbo].[Udf_stringEncryptor](@LastName),  
+				[dbo].[Udf_stringEncryptor](@EmailAddress),  
+				[dbo].[Udf_stringEncryptor](@DepartmentName),  
+				@OrganizationsID,  
+				0,  
+				0,  
+				0,  
+				GETDATE(),  
+				@IsStaff,  
+				1,
+				0,
+				@InitialRoleID,
+				@ChildOrganizationsID
+			)  
+  
+            set @AccountInviteToken = @newGuid  		
+			set @OrganizationType = (select OrganizationTypesId FROM  [dbo].[tblSiteOrganization] where OrganizationID=@OrganizationsID)
+            set @ReturnCode = '200'  
+        END  
+  
+  ELSE   
+  BEGIN    
+            set @AccountInviteToken = '00000000-0000-0000-0000-000000000000'  
+            set @ReturnCode = '201'  
+  END  
+  
+        COMMIT TRAN  
+  
+    END TRY  
+    BEGIN CATCH  
+        ROLLBACK TRAN  
+  
+        DECLARE @ErrorMessage NVARCHAR(4000);  
+        DECLARE @ErrorSeverity INT;  
+        DECLARE @ErrorState INT;  
+  
+        SELECT @ErrorMessage = ERROR_MESSAGE(),  
+               @ErrorSeverity = ERROR_SEVERITY(),  
+               @ErrorState = ERROR_STATE();  
+  
+        RAISERROR(   @ErrorMessage,  -- Message text.  
+                     @ErrorSeverity, -- Severity.  
+                     @ErrorState     -- State.  
+                 );  
+    END CATCH;  
+END  
+  
+  
+  
+  
+/****** Object:  StoredProcedure [dbo].[USP_SiteDeleteStaff]    Script Date: 2/23/2022 6:41:08 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================  
+-- Author:  <Author,,Name>  
+-- Create date: <Create Date,,>  
+-- Description: <Description,,>  
+-- =============================================  
+Create PROCEDURE [dbo].[USP_SiteDeleteStaff]  
+@AccountGUID nvarchar(max),  
+@ReturnCode NVARCHAR(20) OUTPUT  
+AS  
+BEGIN  
+BEGIN TRAN  
+BEGIN TRY  
+ -- SET NOCOUNT ON added to prevent extra result sets from  
+ -- interfering with SELECT statements.  
+ SET NOCOUNT ON;  
+  
+  BEGIN  
+  
+   Update  [dbo].tblSiteAccountInvites  
+   SET    IsDeleted = 1 , IsActive=0 
+   where   AccountInviteGuid = @AccountGUID  
+     set @ReturnCode='200'  
+  
+  END  
+     
+COMMIT TRAN  
+END TRY  
+BEGIN CATCH  
+ROLLBACK TRAN  
+  
+    DECLARE @ErrorMessage NVARCHAR(4000);  
+    DECLARE @ErrorSeverity INT;  
+    DECLARE @ErrorState INT;  
+  
+    SELECT @ErrorMessage = ERROR_MESSAGE(),  
+           @ErrorSeverity = ERROR_SEVERITY(),  
+           @ErrorState = ERROR_STATE();  
+      
+    RAISERROR (@ErrorMessage, -- Message text.  
+               @ErrorSeverity, -- Severity.  
+               @ErrorState -- State.  
+               );  
+END CATCH;  
+END   
+  
+  
+  
+  /****** Object:  StoredProcedure [dbo].[USP_SiteGetStaffDetails]    Script Date: 2/23/2022 6:40:49 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================  
+-- Author:  <Author,,Name>  
+-- Create date: <Create Date,,>  
+-- Description: <Description,,>  
+-- select * from tblSiteAccountInvites  
+-- exec [dbo].[USP_SiteGetStaffDetails] '5B872297-87B3-4A57-A1C3-ADAF51F9B9A2','200'
+-- =============================================  
+Create PROCEDURE [dbo].[USP_SiteGetStaffDetails]  
+@AccountGUID nvarchar(max),  
+@ReturnCode NVARCHAR(20) OUTPUT  
+AS    
+BEGIN  
+BEGIN TRAN  
+BEGIN TRY  
+ -- SET NOCOUNT ON added to prevent extra result sets from  
+ -- interfering with SELECT statements.  
+ SET NOCOUNT ON;  
+  
+  BEGIN  
+  
+  Select   
+   [dbo].[UDF_StringDecryptor](iv.FirstName) as FirstName,  
+   [dbo].[UDF_StringDecryptor](iv.LastName) as LastName,  
+   [dbo].[UDF_StringDecryptor](iv.EmailAddress) as Email,  
+   iv.AccountInviteGuid as StaffGuid,  
+   [dbo].[UDF_StringDecryptor](iv.FirstName) + '-00' + CONVERT(NVARCHAR,  US.UserID)  as StaffCode,
+   iv.IsActive,
+   iv.IsBlocked,
+   iv.IsDeleted,
+   iv.[InviteAccept],
+   iv.[IsStaff],
+   iv.InviteSentDate as InviteDate,
+   MR.[RoleName],
+   MR.[RoleDescription] as Description,
+   [dbo].[UDF_StringDecryptor](USP.[MiddleName]) as MiddleName,
+   [dbo].[UDF_StringDecryptor](USP.MaidenName) as MaidenName,
+   [dbo].[UDF_StringDecryptor](iv.DepartmentName) as OtherName,
+   [dbo].[UDF_StringDecryptor](US.UserName) as UserName,
+   USP.GenderId,
+   USP.MaritalStatusId,
+   USP.NativeSpokenLanguage,
+   USP.CountryID,
+   USP.StateName,
+   US.UserID,
+   [dbo].[UDF_StringDecryptor](USP.Age) as Age,
+   [dbo].[UDF_StringDecryptor](USP.DOB) as DOB,
+   [dbo].[UDF_StringDecryptor](USP.PrimaryContactNumber) as PrimaryContactNumber,
+   [dbo].[UDF_StringDecryptor](USP.SecondaryContactNumber) as SecondaryContactNumber,
+   ProfilePicture 
+  from tblSiteAccountInvites IV  
+  JOIN [dbo].[tblSiteUsers] US on US.AccountInviteGuid = IV.AccountInviteGuid 
+  join [dbo].[tblSiteUIChildUserRoleAssign] CR on US.[UserID] = CR.[UserID]    
+  join [dbo].[tblSiteMasterRoles] MR on CR.[RoleID] = MR.[RoleID]     
+  LEFT JOIN [dbo].[tblSiteUserProfiles] USP on USP.UserID = US.UserID 
+  Where IV.AccountInviteGuid = @AccountGUID  
+  
+  END  
+     
+COMMIT TRAN  
+END TRY  
+BEGIN CATCH  
+ROLLBACK TRAN  
+  
+    DECLARE @ErrorMessage NVARCHAR(4000);  
+    DECLARE @ErrorSeverity INT;  
+    DECLARE @ErrorState INT;  
+  
+    SELECT @ErrorMessage = ERROR_MESSAGE(),  
+           @ErrorSeverity = ERROR_SEVERITY(),  
+           @ErrorState = ERROR_STATE();  
+      
+    RAISERROR (@ErrorMessage, -- Message text.  
+               @ErrorSeverity, -- Severity.  
+               @ErrorState -- State.  
+               );  
+END CATCH;  
+END   
+  
+  
+  
+  
+/****** Object:  StoredProcedure [dbo].[USP_SiteStaffSearch]    Script Date: 2/23/2022 6:40:28 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+  
+-- exec [dbo].[USP_SiteStaffSearch_Test] 'rohan','garg','rohang@yopmail.com',30-11-2021 18:30:00,16-12-2021 18:30:00,2,true,true,false  
+  
+Create PROCEDURE [dbo].[USP_SiteStaffSearch] 
+     
+ @FirstName nvarchar(200),  
+ @LastName nvarchar(200),  
+ @EmailAddress nvarchar(200),  
+ @StartDate datetime = null,  
+ @EndDate datetime = null, 
+ @OrganizationID bigint,
+ @IsActive bit = null,
+ @InviteAccept bit = null
+
+
+   -- @ReturnCode NVARCHAR(20) OUTPUT  
+AS    
+BEGIN 
+   IF (@FirstName = '' AND @LastName='' AND @EmailAddress='' AND @StartDate is null  AND @EndDate is null AND @InviteAccept is null AND @IsActive is null) 
+  BEGIN  
+ SELECT  
+  [dbo].[UDF_StringDecryptor](iv.FirstName) as FirstName,  
+  [dbo].[UDF_StringDecryptor](iv.LastName) as LastName,  
+  [dbo].[UDF_StringDecryptor](iv.EmailAddress) as Email,  
+  iv.AccountInviteGuid as StaffGuid,  
+  iv.IsActive,iv.InviteSentDate as InviteSend,iv.[InviteAccept],  
+  iv.ChildOrganizationID,iv.IsStaff,  
+   iv.[InviteSentDate]
+    --CR.RoleID as InitialRoleID,
+  --iv.InitialRoleID
+  --FROM [dbo].[tblAccountInvites] iv   
+  --where iv.OrganizationsID= @OrganizationID  
+
+    from [dbo].[tblSiteAccountInvites] iv     
+  --join [dbo].[tblAccountInvites] iv on US.[AccountInviteGuid]=iv.[AccountInviteGuid]   
+  --join [dbo].[tblUIChildUserRoleAssign] CR on US.[UserID] = CR.[UserID]  
+  --join [dbo].[tblMasterRoles] MR on CR.[RoleID] = MR.[RoleID]  
+
+ -- and iv.IsDeleted is null 
+  where iv.ChildOrganizationID is null  
+  and iv.IsStaff =1
+  and iv.InviteAccept = @InviteAccept
+  order by iv.InviteSentDate desc;
+
+  END  
+  ELSE  
+  BEGIN   
+
+  if(@InviteAccept = 1)
+  BEGIN
+   SELECT  
+      [dbo].[UDF_StringDecryptor](iv.FirstName) as FirstName,  
+	  [dbo].[UDF_StringDecryptor](iv.LastName) as LastName,  
+	  [dbo].[UDF_StringDecryptor](iv.EmailAddress) as Email,  
+	  iv.AccountInviteGuid as StaffGuid,  
+	  iv.IsActive,
+	  iv.IsDeleted,
+	  iv.InviteSentDate,
+	  iv.[InviteAccept],
+	  iv.InitialRoleID,
+	  iv.ChildOrganizationID,
+	  iv.IsStaff,
+	  MR.RoleName,iv.[InviteSentDate],  
+	  CR.RoleID as InitialRoleID
+  --FROM [dbo].[tblAccountInvites] iv   
+  
+  from [dbo].[tblSiteAccountInvites] iv     
+  join [dbo].[tblSiteUsers] US on US.[AccountInviteGuid]=iv.[AccountInviteGuid]   
+  join [dbo].[tblSiteUIChildUserRoleAssign] CR on US.[UserID] = CR.[UserID]  
+  join [dbo].[tblSiteMasterRoles] MR on CR.[RoleID] = MR.[RoleID]   
+ 
+       
+  where [dbo].[UDF_StringDecryptor](iv.FirstName) LIKE '%' +  COALESCE(NULLIF(@FirstName, ''), [dbo].[UDF_StringDecryptor](iv.FirstName))+ '%'   
+  AND [dbo].[UDF_StringDecryptor](iv.LastName) LIKE '%' +  COALESCE(NULLIF(@LastName, ''), [dbo].[UDF_StringDecryptor](iv.LastName))+ '%'   
+  AND [dbo].[UDF_StringDecryptor](iv.EmailAddress) LIKE '%' +  COALESCE(NULLIF(@EmailAddress, ''), [dbo].[UDF_StringDecryptor](iv.EmailAddress))+ '%'
+  AND iv.InviteSentDate BETWEEN COALESCE(NULLIF(@StartDate, DATEADD(year,-100,GETDATE())),iv.InviteSentDate) AND COALESCE(NULLIF(@EndDate,DATEADD(year,100,GETDATE())), iv.InviteSentDate)
+  
+
+ -- SELECT coalesce(null, cast(1 as bit)) 
+  AND iv.IsActive =  COALESCE(NULLIF(@IsActive, null),iv.IsActive)
+  --AND iv.IsActive =  COALESCE(NULLIF(@IsActive, null),iv.IsActive)
+  --AND iv.[InviteAccept] =  COALESCE(NULLIF(@InviteAccept, null),iv.[InviteAccept])
+  AND iv.InviteAccept = 1
+
+ --AND iv.OrganizationsID= @OrganizationID  
+ AND iv.OrganizationsID = @OrganizationID AND ( iv.IsDeleted IS NULL  OR iv.IsDeleted = 0 )
+ AND iv.ChildOrganizationID is null  and iv.IsStaff =1
+  order by iv.InviteSentDate desc;  
+  END
+  ELSE 
+  BEGIN
+   SELECT  
+      [dbo].[UDF_StringDecryptor](iv.FirstName) as FirstName,  
+	  [dbo].[UDF_StringDecryptor](iv.LastName) as LastName,  
+	  [dbo].[UDF_StringDecryptor](iv.EmailAddress) as Email,  
+	  iv.AccountInviteGuid as StaffGuid,  
+	  iv.IsActive,
+	  iv.IsDeleted,
+	  iv.InviteSentDate,
+	  iv.[InviteAccept],
+	  --iv.InitialRoleID,
+	  iv.ChildOrganizationID,
+	  iv.IsStaff
+	  --MR.RoleName,iv.[InviteSentDate],  
+	  -- CR.RoleID as InitialRoleID
+  --FROM [dbo].[tblAccountInvites] iv   
+  
+  from [dbo].[tblSiteAccountInvites] iv     
+  --join [dbo].[tblAccountInvites] iv on US.[AccountInviteGuid]=iv.[AccountInviteGuid]   
+  --join [dbo].[tblUIChildUserRoleAssign] CR on US.[UserID] = CR.[UserID]  
+  --join [dbo].[tblMasterRoles] MR on CR.[RoleID] = MR.[RoleID]   
+ 
+       
+  where [dbo].[UDF_StringDecryptor](iv.FirstName) LIKE '%' +  COALESCE(NULLIF(@FirstName, ''), [dbo].[UDF_StringDecryptor](iv.FirstName))+ '%'   
+  AND [dbo].[UDF_StringDecryptor](iv.LastName) LIKE '%' +  COALESCE(NULLIF(@LastName, ''), [dbo].[UDF_StringDecryptor](iv.LastName))+ '%'   
+  AND [dbo].[UDF_StringDecryptor](iv.EmailAddress) LIKE '%' +  COALESCE(NULLIF(@EmailAddress, ''), [dbo].[UDF_StringDecryptor](iv.EmailAddress))+ '%'
+  AND iv.InviteSentDate BETWEEN COALESCE(NULLIF(@StartDate, DATEADD(year,-100,GETDATE())),iv.InviteSentDate) AND COALESCE(NULLIF(@EndDate,DATEADD(year,100,GETDATE())), iv.InviteSentDate)
+  
+
+ -- SELECT coalesce(null, cast(1 as bit)) 
+  AND iv.IsActive =  COALESCE(NULLIF(@IsActive, null),iv.IsActive)
+  --AND iv.IsActive =  COALESCE(NULLIF(@IsActive, null),iv.IsActive)
+  --AND iv.[InviteAccept] =  COALESCE(NULLIF(@InviteAccept, null),iv.[InviteAccept])
+  AND iv.InviteAccept = 0
+
+ --AND iv.OrganizationsID= @OrganizationID  
+ AND iv.OrganizationsID = @OrganizationID AND  ( iv.IsDeleted IS NULL  OR iv.IsDeleted = 0 )
+ AND iv.ChildOrganizationID is null  and iv.IsStaff =1
+  order by iv.InviteSentDate desc;  
+  END
+
+  
+   
+   END     
+  
+  END
+  
+  
+  
+/****** Object:  StoredProcedure [dbo].[USP_AdminInviteUrlSave]    Script Date: 2/23/2022 8:48:26 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+  
+Create PROCEDURE [dbo].[USP_SiteAdminInviteUrlSave]  
+@TokenGUID uniqueidentifier,  
+@URL nvarchar(max),  
+  
+@ReturnCode NVARCHAR(20) OUTPUT  
+AS  
+BEGIN  
+BEGIN TRAN  
+BEGIN TRY  
+ -- SET NOCOUNT ON added to prevent extra result sets from  
+ -- interfering with SELECT statements.  
+ SET NOCOUNT ON;  
+  BEGIN  
+  Update  [dbo].[tblSiteAccountInvites] SET [InvitedURL] = @URL  WHERE [AccountInviteGuid]  = @TokenGUID  
+        set @ReturnCode='200'  
+  END  
+     
+COMMIT TRAN  
+END TRY  
+BEGIN CATCH  
+ROLLBACK TRAN  
+  
+    DECLARE @ErrorMessage NVARCHAR(4000);  
+    DECLARE @ErrorSeverity INT;  
+    DECLARE @ErrorState INT;  
+  
+    SELECT @ErrorMessage = ERROR_MESSAGE(),  
+           @ErrorSeverity = ERROR_SEVERITY(),  
+           @ErrorState = ERROR_STATE();  
+      
+    RAISERROR (@ErrorMessage, -- Message text.  
+               @ErrorSeverity, -- Severity.  
+               @ErrorState -- State.  
+               );  
+END CATCH;  
+END   
+  
+  
+  SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================      
+-- Author:      <NiteshKumar Sukalikar>      
+-- Create date: <25/5/2020>      
+-- Description: <Return user by Id>      
+-- exec [dbo].[USP_SiteGetEmailTemplateByCode] 'AA00'  
+-- =============================================      
+Create PROCEDURE [dbo].[USP_SiteGetEmailTemplateByCode] @Code varchar(8)
+AS
+BEGIN
+  IF (@Code = '')
+  BEGIN
+    RETURN
+  END
+  ELSE
+  BEGIN
+    SELECT
+      OG.[EmailTemplateID],
+      OG.[EmailTemplateGuid],
+      OG.[EmailTemplateCode],
+	  OG.[EmailTemplateName],
+	  OG.[EmailTemplateDescription],
+	   OG.[EmailTemplateBody],
+	  OG.[EmailTemplateType],
+	  OG.[EmailTemplateSenderName],
+	  OG.EmailTemplateSenderEmailAddress,
+	  OG.[EmailTemplateSubject]
+    FROM [dbo].[tblSiteMasterEmailTemplate] OG
+    WHERE OG.[EmailTemplateCode] = @Code
+	
+  END
+END
+
+
+/****** Object:  StoredProcedure [dbo].[USP_SiteAcceptInvite]    Script Date: 2/23/2022 8:47:17 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+Create PROCEDURE [dbo].[USP_SiteAcceptInvite]
+    @AcceptenceToken uniqueidentifier,
+	@Password NVARCHAR(200),
+	@UserName NVARCHAR(200),
+    @ReturnCode NVARCHAR(20) OUTPUT
+
+AS
+Declare @ChildOrganizationID bigint
+BEGIN
+    BEGIN TRAN
+    BEGIN TRY
+        -- SET NOCOUNT ON added to prevent extra result sets from
+        -- interfering with SELECT statements.
+        SET NOCOUNT ON;
+
+        BEGIN
+		
+			Update [tblSiteAccountInvites]
+			set [InviteAccept] = 1, [InviteAcceptedDate] = GETDATE()
+			where [tblSiteAccountInvites].[AccountInviteGuid] = @AcceptenceToken
+
+		if object_id('tempdb..##tempAccpInvite','U') is not null
+           drop table ##tempAccpInvite
+		 Select top 1
+                *
+            into ##tempAccpInvite
+            from [dbo].[tblSiteAccountInvites]  INV
+            where INV.[AccountInviteGuid] = @AcceptenceToken 
+
+			Declare @IsStaffbit bit
+			set @IsStaffbit = (select IsStaff FROM   ##tempAccpInvite)
+
+			set @ChildOrganizationID = (select ChildOrganizationID FROM  ##tempAccpInvite)
+
+			Declare @InitialRoleId bigint
+			set @InitialRoleId = (select InitialRoleID FROM   ##tempAccpInvite)
+
+            INSERT INTO [dbo].[tblSiteUsers]
+            (
+                [AccountInviteGuid],
+				[IsStaff],
+				[MacAddress],
+				[TransactionCode],
+				[IsActive],
+				[UserName],
+			    [UserPassword],
+				[ChildOrganizationID],
+				[OrganizationID]
+            )
+			
+           SELECT 
+		     @AcceptenceToken,--NEWID(),
+			 @IsStaffbit,
+		    '123.123.45.56',
+		    '12345',
+		     1,
+		    [dbo].[Udf_stringEncryptor](@UserName),
+            [dbo].[Udf_stringEncryptor](@Password),
+			@ChildOrganizationID,		
+		    OrganizationsID FROM  ##tempAccpInvite
+				
+
+			Declare @UserID bigint;
+			set @UserID=SCOPE_IDENTITY();
+
+			IF (@InitialRoleId is not null)
+			BEGIN
+
+			INSERT INTO [dbo].[tblSiteUIChildUserRoleAssign]
+            (
+                [RoleID],
+				[UserID]
+            )			
+           VALUES  
+			(  		    
+		    @InitialRoleId,
+			@UserID
+			)
+
+			END
+
+			set @ReturnCode = '200'
+
+           drop table  ##tempAccpInvite
+
+  
+          END
+        COMMIT TRAN
+
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRAN
+
+        DECLARE @ErrorMessage NVARCHAR(4000);
+        DECLARE @ErrorSeverity INT;
+        DECLARE @ErrorState INT;
+
+        SELECT @ErrorMessage = ERROR_MESSAGE(),
+               @ErrorSeverity = ERROR_SEVERITY(),
+               @ErrorState = ERROR_STATE();
+
+        RAISERROR(   @ErrorMessage,  -- Message text.
+                     @ErrorSeverity, -- Severity.
+                     @ErrorState     -- State.
+                 );
+    END CATCH;
+END
+
+
+/****** Object:  StoredProcedure [dbo].[USP_SiteUpdateStaffDetails]    Script Date: 2/24/2022 10:27:57 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================  
+-- Author:  <Author,,Name>  
+-- Create date: <Create Date,,>  
+-- Description: <Description,,>  
+-- select * from tblSiteAccountInvites  
+-- exec [dbo].[USP_SiteGetStaffDetails] '27E03FA1-9B78-4C9F-8072-38F0233EE6AE','200'
+-- =============================================  
+Create PROCEDURE [dbo].[USP_SiteUpdateStaffDetails]
+    @FirstName nvarchar(max),
+    @LastName nvarchar(max),
+    @OtherName nvarchar(max),
+    @MaidenName nvarchar(max),
+    @MiddleName nvarchar(max),
+    @GenderId smallint,
+    @MaritalStatusId int,
+    @Age nvarchar(max),
+    @NativeSpokenLanguage nvarchar(50),
+    @DOB nvarchar(max),
+    @PrimaryContactNumber nvarchar(max),
+    @SecondaryContactNumber nvarchar(max),
+    @CountryID int,
+    @StateName nvarchar(200),
+    @ProfilePicture nvarchar(300) = '',
+    @UserID bigint,
+    @AccountID nvarchar(max),
+    @Email nvarchar(max),
+    @SponsorID bigint,
+    @ReturnCode NVARCHAR(20) OUTPUT
+AS
+BEGIN
+    BEGIN TRAN
+    BEGIN TRY
+        -- SET NOCOUNT ON added to prevent extra result sets from  
+        -- interfering with SELECT statements.  
+        SET NOCOUNT ON;
+
+        BEGIN
+
+            if (@UserID is null or @UserID = 0)
+            BEGIN
+                set @ReturnCode = '500'
+                return
+            END
+            ELSE
+            BEGIN
+
+                Update [dbo].[tblSiteAccountInvites]
+                SET FirstName = [dbo].[Udf_stringEncryptor](@FirstName),
+                    LastName = [dbo].[Udf_stringEncryptor](@LastName),
+					DepartmentName = [dbo].[Udf_stringEncryptor](@OtherName)
+                Where AccountInviteGuid = @AccountID
+
+                IF NOT EXISTS
+                (
+                    SELECT top 1
+                        *
+                    from [tblSiteUserProfiles]
+                    where UserID = @UserID
+                )
+                BEGIN
+                    INSERT INTO [dbo].[tblSiteUserProfiles]
+                    (
+                        [UserProfileGuid],
+                        [FirstName],
+                        [MiddleName],
+                        [LastName],
+                        [MaidenName],
+                        [OtherName],
+                        [UserID],
+                        [GenderId],
+                        [MaritalStatusId],
+                        [NativeSpokenLanguage],
+                        [CreatedByLoginID],
+                        [IsActive],
+                        [IsDeleted],
+                        [StateName],
+                        [CountryID],
+                        [Age],
+                        [DOB],
+                        [EmailAddress],
+                        [PrimaryContactNumber],
+                        [SecondaryContactNumber],
+                        [ProfilePicture]
+                    )
+                    VALUES
+                    (NEWID(),
+                     [dbo].[Udf_stringEncryptor](@FirstName),
+                     [dbo].[Udf_stringEncryptor](@MiddleName),
+                     [dbo].[Udf_stringEncryptor](@LastName),
+                     [dbo].[Udf_stringEncryptor](@MaidenName),
+                     [dbo].[Udf_stringEncryptor](@OtherName),
+                     @UserID,
+                     @GenderId,
+                     @MaritalStatusId,
+                     @NativeSpokenLanguage,
+                     @SponsorID,
+                     1  ,
+                     0  ,
+                     @StateName,
+                     @CountryID,
+                     [dbo].[Udf_stringEncryptor](@Age),
+                     [dbo].[Udf_stringEncryptor](@DOB),
+                     [dbo].[Udf_stringEncryptor](@Email),
+                     [dbo].[Udf_stringEncryptor](@PrimaryContactNumber),
+                     [dbo].[Udf_stringEncryptor](@SecondaryContactNumber),
+                     @ProfilePicture
+                    )
+                    set @ReturnCode = '200'
+                END
+                ELSE
+                BEGIN
+                    Update [dbo].[tblSiteUserProfiles]
+                    SET FirstName = [dbo].[Udf_stringEncryptor](@FirstName),
+                        LastName = [dbo].[Udf_stringEncryptor](@LastName),
+                        MiddleName = [dbo].[Udf_stringEncryptor](@MiddleName),
+                        MaidenName = [dbo].[Udf_stringEncryptor](@MaidenName),
+                        OtherName = [dbo].[Udf_stringEncryptor](@LastName),
+                        EmailAddress = [dbo].[Udf_stringEncryptor](@Email),
+                        GenderId = @GenderId,
+                        MaritalStatusId = @MaritalStatusId,
+                        NativeSpokenLanguage = @NativeSpokenLanguage,
+                        CountryID = @CountryID,
+                        StateName = @StateName,
+                        Age = [dbo].[Udf_stringEncryptor](@Age),
+                        DOB = [dbo].[Udf_stringEncryptor](@DOB),
+                        PrimaryContactNumber = [dbo].[Udf_stringEncryptor](@PrimaryContactNumber),
+                        SecondaryContactNumber = [dbo].[Udf_stringEncryptor](@SecondaryContactNumber),
+                        ProfilePicture = @ProfilePicture
+                    where UserID = @UserID
+
+                    set @ReturnCode = '200'
+                END
+            END
+        END
+
+        COMMIT TRAN
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRAN
+
+        DECLARE @ErrorMessage NVARCHAR(4000);
+        DECLARE @ErrorSeverity INT;
+        DECLARE @ErrorState INT;
+
+        SELECT @ErrorMessage = ERROR_MESSAGE(),
+               @ErrorSeverity = ERROR_SEVERITY(),
+               @ErrorState = ERROR_STATE();
+
+        RAISERROR(   @ErrorMessage,  -- Message text.  
+                     @ErrorSeverity, -- Severity.  
+                     @ErrorState     -- State.  
+                 );
+    END CATCH;
+END
+
+
+
+/****** Object:  StoredProcedure [dbo].[USP_SiteActiveInactiveStaff]    Script Date: 2/24/2022 10:22:16 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- Select * from [dbo].[tblSiteAccountInvites]
+-- =============================================
+Create PROCEDURE [dbo].[USP_SiteActiveInactiveStaff]
+    @Id uniqueidentifier,
+    @ReturnCode NVARCHAR(20) OUTPUT
+AS
+Declare @Status bit;
+BEGIN
+    BEGIN TRAN
+    BEGIN TRY
+        -- SET NOCOUNT ON added to prevent extra result sets from
+        -- interfering with SELECT statements.
+        SET NOCOUNT ON;
+
+        BEGIN
+
+            Select top 1
+                *
+            into ##temp
+            from [dbo].[tblSiteAccountInvites] iv
+            where iv.AccountInviteGuid = @Id
+
+            Select @Status = IsActive
+            from ##temp
+
+            DROP TABLE ##temp;
+
+            if (@Status = 1)
+            BEGIN
+                Update [dbo].[tblSiteAccountInvites]
+                SET IsActive = 0
+                where AccountInviteGuid = @Id
+                set @ReturnCode = '200'
+            END
+            ELSE
+            BEGIN
+                Update [dbo].[tblSiteAccountInvites]
+                SET IsActive = 1
+                 where AccountInviteGuid = @Id
+                set @ReturnCode = '200'
+            END
+
+        END
+
+        COMMIT TRAN
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRAN
+
+        DECLARE @ErrorMessage NVARCHAR(4000);
+        DECLARE @ErrorSeverity INT;
+        DECLARE @ErrorState INT;
+
+        SELECT @ErrorMessage = ERROR_MESSAGE(),
+               @ErrorSeverity = ERROR_SEVERITY(),
+               @ErrorState = ERROR_STATE();
+
+        RAISERROR(   @ErrorMessage,  -- Message text.
+                     @ErrorSeverity, -- Severity.
+                     @ErrorState     -- State.
+                 );
+    END CATCH;
+END
+
+
+
+
+/****** Object:  StoredProcedure [dbo].[USP_SiteGetStaffInvite]    Script Date: 2/24/2022 10:21:48 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================  
+-- Author:  <Author,,Name>  
+-- Create date: <Create Date,,>  
+-- Description: <Description,,>  
+-- select * from tblSiteAccountInvites  
+-- =============================================  
+Create PROCEDURE [dbo].[USP_SiteGetStaffInvite]  
+@AccountGUID nvarchar(max),  
+@ReturnCode NVARCHAR(20) OUTPUT  
+AS  
+Declare @Status bit;  
+BEGIN  
+BEGIN TRAN  
+BEGIN TRY  
+ -- SET NOCOUNT ON added to prevent extra result sets from  
+ -- interfering with SELECT statements.  
+ SET NOCOUNT ON;  
+  
+  BEGIN  
+  
+  Select   
+   [dbo].[UDF_StringDecryptor](iv.FirstName) as FirstName,  
+   [dbo].[UDF_StringDecryptor](iv.LastName) as LastName,  
+   [dbo].[UDF_StringDecryptor](iv.EmailAddress) as Email,  
+   iv.AccountInviteGuid as StaffGuid,  
+   iv.IsActive,iv.IsBlocked,iv.IsDeleted,  
+   iv.InviteSentDate as InviteDate    
+  from tblSiteAccountInvites IV  
+  Where AccountInviteGuid = @AccountGUID  
+  
+  END  
+     
+COMMIT TRAN  
+END TRY  
+BEGIN CATCH  
+ROLLBACK TRAN  
+  
+    DECLARE @ErrorMessage NVARCHAR(4000);  
+    DECLARE @ErrorSeverity INT;  
+    DECLARE @ErrorState INT;  
+  
+    SELECT @ErrorMessage = ERROR_MESSAGE(),  
+           @ErrorSeverity = ERROR_SEVERITY(),  
+           @ErrorState = ERROR_STATE();  
+      
+    RAISERROR (@ErrorMessage, -- Message text.  
+               @ErrorSeverity, -- Severity.  
+               @ErrorState -- State.  
+               );  
+END CATCH;  
+END   
+  
+  
+  
+  /****** Object:  StoredProcedure [dbo].[USP_SiteUpdateInvite_Staff]    Script Date: 2/24/2022 10:19:18 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+      
+Create PROCEDURE [dbo].[USP_SiteUpdateInvite_Staff]      
+      
+  @AccountInviteGuid uniqueidentifier,      
+  @FirstName nvarchar(200),      
+  @LastName nvarchar(200),
+  @DepartmentName nvarchar(200) = '',
+  @RoleID bigint,
+  @ReturnCode NVARCHAR(20) OUTPUT   
+      
+AS      
+Declare @SubId bigint;      
+BEGIN      
+    BEGIN TRAN      
+    BEGIN TRY      
+        -- SET NOCOUNT ON added to prevent extra result sets from      
+        -- interfering with SELECT statements.      
+      
+  Select top 1  * into ##tempOldStaffEmail from tblSiteAccountInvites where AccountInviteGuid = @AccountInviteGuid       
+      
+   if object_id('tempdb..##tempUpdStaffInvites','U') is not null      
+           drop table tempUpdStaffInvites     
+        SET NOCOUNT ON;      
+      
+   BEGIN       
+   Update tblSiteAccountInvites      
+   set FirstName = [dbo].[Udf_stringEncryptor](@FirstName)      
+   ,LastName =  [dbo].[Udf_stringEncryptor](@LastName)
+   ,DepartmentName = [dbo].[Udf_stringEncryptor](@DepartmentName)
+  ,InviteSentDate = GETDATE() 
+   where AccountInviteGuid = @AccountInviteGuid      
+
+    Declare @UserID bigint;
+
+     Select top 1  * into ##tempUserId from tblSiteUsers where AccountInviteGuid = @AccountInviteGuid	
+			
+			set @UserID = (Select UserID from ##tempUserId)
+			IF (@RoleID is not null)
+			BEGIN			
+			   Update [dbo].[tblSiteUIChildUserRoleAssign] 
+			   set [RoleID] = @RoleID 
+			   where UserID = @UserID  
+
+			END
+                
+   DROP TABLE ##tempUserId
+   DROP TABLE ##tempOldStaffEmail; 
+
+   set @ReturnCode = '200'      
+    END      
+      
+        COMMIT TRAN      
+      
+    END TRY      
+    BEGIN CATCH      
+        ROLLBACK TRAN      
+      
+        DECLARE @ErrorMessage NVARCHAR(4000);      
+        DECLARE @ErrorSeverity INT;      
+        DECLARE @ErrorState INT;      
+      
+        SELECT @ErrorMessage = ERROR_MESSAGE(),      
+               @ErrorSeverity = ERROR_SEVERITY(),      
+               @ErrorState = ERROR_STATE();      
+      
+        RAISERROR(   @ErrorMessage,  -- Message text.      
+                     @ErrorSeverity, -- Severity.      
+                     @ErrorState     -- State.      
+                 );      
+    END CATCH;      
+END 
+
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- exec [dbo].[USP_SiteViewOrganization_Staff_InviteById] '6a562230-b577-46d2-8338-fbc6a3adec5b','200'
+
+Create PROCEDURE [dbo].[USP_SiteViewOrganization_Staff_InviteById]
+   -- @OrganizationID bigint,
+	  @AccountInviteGuid nvarchar(max),  
+	  @ReturnCode NVARCHAR(20) OUTPUT
+	AS
+
+BEGIN
+    BEGIN TRAN
+    BEGIN TRY
+        SELECT	
+		iv.[AccountInviteGuid],
+		[dbo].[UDF_StringDecryptor](iv.[FirstName]) as FirstName,
+		[dbo].[UDF_StringDecryptor](iv.[LastName]) as LastName,
+		[dbo].[UDF_StringDecryptor](iv.[EmailAddress]) as Email,
+		CR.RoleID as InitialRoleID,
+		iv.IsActive,
+		iv.IsDeleted,
+		US.UserID,
+		[dbo].[UDF_StringDecryptor](iv.DepartmentName) as DepartmentName
+		--iv.AccountInviteGuid as StaffGuid,  
+		--iv.[InviteSentDate],
+		--iv.[InviteAccept],
+		--US.organizationId
+		from [dbo].[tblSiteUsers] US	
+		join [dbo].[tblSiteAccountInvites] iv on US.[AccountInviteGuid]=iv.[AccountInviteGuid]
+		join [dbo].[tblSiteUIChildUserRoleAssign] CR on US.[UserID] = CR.[UserID]
+		where  iv.AccountInviteGuid = @AccountInviteGuid AND US.AccountInviteGuid = iv.AccountInviteGuid AND US.[IsStaff]=1
+
+		set @ReturnCode = '200'
+
+		COMMIT TRAN  
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRAN
+
+        DECLARE @ErrorMessage NVARCHAR(4000);
+        DECLARE @ErrorSeverity INT;
+        DECLARE @ErrorState INT;
+
+        SELECT @ErrorMessage = ERROR_MESSAGE(),
+               @ErrorSeverity = ERROR_SEVERITY(),
+               @ErrorState = ERROR_STATE();
+
+        RAISERROR(   @ErrorMessage,  -- Message text.
+                     @ErrorSeverity, -- Severity.
+                     @ErrorState     -- State.
+                 );
+    END CATCH;
+END
+
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- select * from [tblSiteAccountInvites]
+--exec [dbo].[USP_SiteGetOrganization_StaffInvite_List] 2,false,'200'  
+  
+Create PROCEDURE [dbo].[USP_SiteGetOrganization_StaffInvite_List]      
+    @OrganizationID bigint,      
+	@InviteFlag bit,
+   @ReturnCode NVARCHAR(20) OUTPUT      
+ AS      
+      
+BEGIN      
+    BEGIN TRAN      
+    BEGIN TRY      
+	if(@InviteFlag = 1)
+	BEGIN
+	SELECT       
+  iv.[AccountInviteGuid],      
+  [dbo].[UDF_StringDecryptor](iv.[FirstName]) as FirstName,      
+  [dbo].[UDF_StringDecryptor](iv.[LastName]) as LastName,      
+  [dbo].[UDF_StringDecryptor](iv.[EmailAddress]) as Email,      
+  iv.AccountInviteGuid as StaffGuid,        
+  iv.[InviteSentDate],      
+  iv.[InviteAccept],
+  iv.IsActive,
+  iv.IsDeleted,
+  --CR.RoleID as InitialRoleID,    
+  --US.organizationId    
+  MR.RoleName    
+  from [dbo].[tblSiteAccountInvites] iv    
+  join [dbo].[tblSiteUsers] US on US.[AccountInviteGuid]=iv.[AccountInviteGuid]     
+  join [dbo].[tblSiteUIChildUserRoleAssign] CR on US.[UserID] = CR.[UserID]    
+  join [dbo].[tblSiteMasterRoles] MR on CR.[RoleID] = MR.[RoleID]     
+  where  iv.OrganizationsID = @OrganizationID
+  and iv.[IsStaff] = 1 
+  and iv.InviteAccept = @InviteFlag
+  AND (iv.IsDeleted IS NULL or iv.IsDeleted = 0) order by iv.InviteSentDate desc;       
+      
+  set @ReturnCode = '200'    
+	END
+	ELSE
+	BEGIN
+	SELECT       
+  iv.[AccountInviteGuid],      
+  [dbo].[UDF_StringDecryptor](iv.[FirstName]) as FirstName,      
+  [dbo].[UDF_StringDecryptor](iv.[LastName]) as LastName,      
+  [dbo].[UDF_StringDecryptor](iv.[EmailAddress]) as Email,      
+  iv.AccountInviteGuid as StaffGuid,        
+  iv.[InviteSentDate],      
+  iv.[InviteAccept],
+  iv.IsActive,
+  iv.IsDeleted
+  --CR.RoleID as InitialRoleID,    
+  --US.organizationId    
+ -- MR.RoleName    
+  from [dbo].[tblSiteAccountInvites] iv    
+  --join [dbo].[tblUsers] US on US.[AccountInviteGuid]=iv.[AccountInviteGuid]     
+  --join [dbo].[tblUIChildUserRoleAssign] CR on US.[UserID] = CR.[UserID]    
+  --join [dbo].[tblMasterRoles] MR on CR.[RoleID] = MR.[RoleID]     
+  where  iv.OrganizationsID = @OrganizationID and iv.[IsStaff]=1 
+  and iv.InviteAccept = @InviteFlag
+  AND iv.IsActive = 1
+  order by iv.InviteSentDate desc;       
+      
+  set @ReturnCode = '200'    
+	END
+          
+      
+  COMMIT TRAN        
+    END TRY      
+    BEGIN CATCH      
+        ROLLBACK TRAN      
+      
+        DECLARE @ErrorMessage NVARCHAR(4000);      
+        DECLARE @ErrorSeverity INT;      
+        DECLARE @ErrorState INT;      
+      
+        SELECT @ErrorMessage = ERROR_MESSAGE(),      
+               @ErrorSeverity = ERROR_SEVERITY(),      
+               @ErrorState = ERROR_STATE();      
+      
+        RAISERROR(   @ErrorMessage,  -- Message text.      
+                     @ErrorSeverity, -- Severity.      
+                     @ErrorState     -- State.      
+                 );      
+    END CATCH;      
+END 
+
+
+/****** Object:  UserDefinedTableType [dbo].[tmpCSArmsInterventions]    Script Date: 2/24/2022 1:22:07 PM ******/
+CREATE TYPE [dbo].[tmpSiteCSArmsInterventions] AS TABLE(
+	[CSArmsInterventionsGuID] [uniqueidentifier] NULL,
+	[CSArmsOrIntervention] [int] NULL,
+	[CSArmsInterventionsText] [varchar](2000) NULL,
+	[OrderNo] [int] NULL,
+	[IsActive] [bit] NULL,
+	[IsPublish] [bit] NULL,
+	[IsDeleted] [bit] NULL
+)
+GO
+/****** Object:  UserDefinedTableType [dbo].[tmpCSConditionOrDisease]    Script Date: 2/24/2022 1:22:08 PM ******/
+CREATE TYPE [dbo].[tmpSiteCSConditionOrDisease] AS TABLE(
+	[CSConditionOrDiseaseGuID] [uniqueidentifier] NULL,
+	[CSConditionOrDisease] [int] NULL,
+	[CSConditionOrDiseaseText] [varchar](2000) NULL,
+	[OrderNo] [int] NULL,
+	[IsActive] [bit] NULL,
+	[IsPublish] [bit] NULL,
+	[IsDeleted] [bit] NULL
+)
+GO
+/****** Object:  UserDefinedTableType [dbo].[tmpCSContact]    Script Date: 2/24/2022 1:22:08 PM ******/
+CREATE TYPE [dbo].[tmpSiteCSContact] AS TABLE(
+	[CSContactGuiD] [uniqueidentifier] NULL,
+	[CSContactFirstName] [varchar](50) NULL,
+	[CSContactMiddleName] [varchar](50) NULL,
+	[CSContactLastName] [varchar](50) NULL,
+	[CSContactPhone1] [varchar](20) NULL,
+	[CSContactPhone2] [varchar](20) NULL,
+	[CSContactEmailAddress1] [varchar](50) NULL,
+	[CSContactEmailAddress2] [varchar](50) NULL,
+	[CSContactAddress1] [varchar](200) NULL,
+	[CSContactAddress2] [varchar](200) NULL,
+	[StateName] [nvarchar](200) NULL,
+	[CountryID] [int] NOT NULL,
+	[OrderNo] [int] NULL,
+	[IsActive] [bit] NULL,
+	[IsPublish] [bit] NULL,
+	[IsDeleted] [bit] NULL
+)
+GO
+/****** Object:  UserDefinedTableType [dbo].[tmpCSCriteria]    Script Date: 2/24/2022 1:22:08 PM ******/
+CREATE TYPE [dbo].[tmpSiteCSCriteria] AS TABLE(
+	[CSCriteriaGuid] [uniqueidentifier] NULL,
+	[CSInclusionExclusion] [int] NULL,
+	[CSCriteriaText] [varchar](2000) NULL,
+	[OrderNo] [int] NULL,
+	[IsActive] [bit] NULL,
+	[IsPublish] [bit] NULL,
+	[IsDeleted] [bit] NULL
+)
+GO
+/****** Object:  UserDefinedTableType [dbo].[tmpCSFileList]    Script Date: 2/24/2022 1:22:08 PM ******/
+CREATE TYPE [dbo].[tmpSiteCSFileList] AS TABLE(
+	[FileNameGuid] [varchar](200) NULL,
+	[OriginalName] [varchar](500) NULL,
+	[Extension] [varchar](50) NULL
+)
+GO
+/****** Object:  UserDefinedTableType [dbo].[tmpCSInterventionOrTreatment]    Script Date: 2/24/2022 1:22:08 PM ******/
+CREATE TYPE [dbo].[tmpSiteCSInterventionOrTreatment] AS TABLE(
+	[CSInterventionOrTreatmentGuID] [uniqueidentifier] NULL,
+	[CSInterventionOrTreatment] [int] NULL,
+	[CSInterventionOrTreatmentText] [varchar](2000) NULL,
+	[OrderNo] [int] NULL
+)
+GO
+/****** Object:  UserDefinedTableType [dbo].[tmpCSInventory]    Script Date: 2/24/2022 1:22:08 PM ******/
+CREATE TYPE [dbo].[tmpSiteCSInventory] AS TABLE(
+	[CSInventoryGuiD] [uniqueidentifier] NULL,
+	[InventoryType] [int] NULL,
+	[InventoryCode] [nvarchar](200) NULL,
+	[InventoryName] [varchar](2000) NULL,
+	[InventoryAvailableQuantity] [int] NULL,
+	[OrderNo] [int] NULL,
+	[IsActive] [bit] NULL,
+	[IsPublish] [bit] NULL,
+	[IsDeleted] [bit] NULL
+)
+GO
+/****** Object:  UserDefinedTableType [dbo].[tmpCSLocation]    Script Date: 2/24/2022 1:22:08 PM ******/
+CREATE TYPE [dbo].[tmpSiteCSLocation] AS TABLE(
+	[CSLocationGuiD] [uniqueidentifier] NULL,
+	[CSLocationAddress1] [varchar](200) NULL,
+	[CSLocationAddress2] [varchar](200) NULL,
+	[CSLocationPhone1] [varchar](20) NULL,
+	[CSLocationPhone2] [varchar](20) NULL,
+	[CSLocationEmailAddress1] [varchar](50) NULL,
+	[CSLocationEmailAddress2] [varchar](50) NULL,
+	[CSLocationName] [varchar](200) NULL,
+	[CSLocationZip] [varchar](20) NULL,
+	[OrderNo] [int] NULL,
+	[IsActive] [bit] NULL,
+	[IsPublish] [bit] NULL,
+	[IsDeleted] [bit] NULL
+)
+GO
+/****** Object:  UserDefinedTableType [dbo].[tmpCsOutcomeMeasures]    Script Date: 2/24/2022 1:22:08 PM ******/
+CREATE TYPE [dbo].[tmpSiteCsOutcomeMeasures] AS TABLE(
+	[CSOutcomeMeasuresGuiD] [uniqueidentifier] NULL,
+	[CSPrimarySecondary] [int] NULL,
+	[CSOutcomeMeasuresText] [varchar](2000) NULL,
+	[OrderNo] [int] NULL,
+	[IsActive] [bit] NULL,
+	[IsPublish] [bit] NULL,
+	[IsDeleted] [bit] NULL
+)
+GO
+/****** Object:  UserDefinedTableType [dbo].[tmpCSPhase]    Script Date: 2/24/2022 1:22:08 PM ******/
+CREATE TYPE [dbo].[tmpSiteCSPhase] AS TABLE(
+	[CSPhaseGuID] [uniqueidentifier] NULL,
+	[CSPhaseText] [varchar](20) NULL,
+	[OrderNo] [int] NULL,
+	[IsActive] [bit] NULL,
+	[IsPublish] [bit] NULL,
+	[IsDeleted] [bit] NULL
+)
+GO
+/****** Object:  UserDefinedTableType [dbo].[tmpCsSearchKeyword]    Script Date: 2/24/2022 1:22:08 PM ******/
+CREATE TYPE [dbo].[tmpSiteCsSearchKeyword] AS TABLE(
+	[SearchKeywordGuid] [uniqueidentifier] NULL,
+	[SearchKeywordText] [varchar](50) NULL,
+	[OrderNo] [int] NULL,
+	[IsActive] [bit] NULL,
+	[IsPublish] [bit] NULL,
+	[IsDeleted] [bit] NULL
+)
+GO
+
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+Create procedure [dbo].[USP_SiteAddStudyInvention]
+    @CSCode varchar(30) = '',
+    @CSTitle varchar(1000) = '',
+    @CSShortDescription varchar(300) = '',
+    @CSInformationProvider bigint = 0,
+    @CSDescription nvarchar(max) = '',
+    @CSStudyType int = 0,
+    @CSActualEnrollment varchar(30) = '',
+    @CSAllocation varchar(150) = '',
+    @CSInterventionMode varchar(150) = '',
+    @CSMasking varchar(150) = '',
+    @CSPrimaryPurpose varchar(150) = '',
+    @CSOfficialTitle varchar(1000) = '',
+    @CSActualStartDate datetime = null,
+    @CSEstPrimaryCompletionDate datetime = null,
+    @CSEstStudyCompletionDate datetime = null,
+    @CSAgesEligible int = 0,
+    @CSAgesEligibleMoreOrLess int = 0,
+    @CSSexesEligible int = 0,
+    @CSAcceptsHealthyVolunteers int = 0,
+    @CSIsVerrified int = 0,
+    @CSIsVerrifiedBy varchar(150) = '',
+    @CSIPDStatement varchar(500) = '',
+    @ShareIPD int = 0,
+    @CSFDADrugProduct int = 0,
+    @CSFDADeviceProduct int = 0,
+    @CSProductUSA int = 0,
+    @Keywordsprovidedby bigint = 0,
+    @SponserID bigint = 0,
+    @IsActive bit = 1,
+    @IsPublish bit = 0,
+    @IsDeleted bit = 0,
+    @CsSearchKeyword tmpSiteCsSearchKeyword ReadOnly,
+    @CsOutcomeMeasures tmpSiteCsOutcomeMeasures ReadOnly,
+    @CSLocation tmpSiteCSLocation ReadOnly,
+    @CSCriteria tmpSiteCSCriteria ReadOnly,
+    @CSContact tmpSiteCSContact ReadOnly,
+    @CSConditionOrDisease tmpSiteCSConditionOrDisease ReadOnly,
+    @CSArmsInterventions tmpSiteCSArmsInterventions ReadOnly,
+    @CSPhase tmpSiteCSPhase ReadOnly,
+    @CSInterventionOrTreatment tmpSiteCSInterventionOrTreatment ReadOnly,
+    @ReturnCode NVARCHAR(20) OUTPUT
+AS
+Declare @CSGuiD uniqueidentifier;
+BEGIN
+
+    BEGIN TRAN
+    BEGIN TRY
+        -- SET NOCOUNT ON added to prevent extra result sets from
+        -- interfering with SELECT statements.
+        SET NOCOUNT ON;
+        declare @CsDetailsId as bigint;
+        declare @AutoGenerateCode as varchar(20);
+        IF NOT EXISTS
+        (
+            SELECT TOP 1
+                CSStudyID
+            FROM tblSiteCSDetails
+            ORDER BY CSStudyID DESC
+        )
+        BEGIN
+            set @CsDetailsId = 0;
+        END
+        ELSE
+        BEGIN
+            set @CsDetailsId =
+            (
+                SELECT TOP 1 CSStudyID FROM tblSiteCSDetails ORDER BY CSStudyID DESC
+            )
+
+        END
+        set @AutoGenerateCode = CONCAT('CTS-00', '', @CsDetailsId + 1)
+        print @AutoGenerateCode
+
+        SET @CSGuiD = NEWID()
+
+
+        INSERT INTO dbo.tblSiteCSDetails
+        (
+            CSGuiD,
+            CSCode,
+            CSTitle,
+            CSShortDescription,
+            CSInformationProvider,
+            CSDescription,
+            CSStudyType,
+            CSActualEnrollment,
+            CSAllocation,
+            CSInterventionMode,
+            CSMasking,
+            CSPrimaryPurpose,
+            CSOfficialTitle,
+            CSActualStartDate,
+            CSEstPrimaryCompletionDate,
+            CSEstStudyCompletionDate,
+            CSAgesEligible,
+            CSAgesEligibleMoreOrLess,
+            CSSexesEligible,
+            CSAcceptsHealthyVolunteers,
+            CSIsVerrified,
+            CSIsVerrifiedBy,
+            CSIPDStatement,
+            ShareIPD,
+            CSFDADrugProduct,
+            CSFDADeviceProduct,
+            CSProductUSA,
+            Keywordsprovidedby,
+            SponserID,
+            IsActive,
+            IsPublish,
+            IsDeleted
+        )
+        VALUES
+        (@CSGuiD,
+         @AutoGenerateCode,
+         @CSTitle,
+         @CSShortDescription,
+         @CSInformationProvider,
+         @CSDescription,
+         @CSStudyType,
+         @CSActualEnrollment,
+         @CSAllocation,
+         @CSInterventionMode,
+         @CSMasking,
+         @CSPrimaryPurpose,
+         @CSOfficialTitle,
+         @CSActualStartDate,
+         @CSEstPrimaryCompletionDate,
+         @CSEstStudyCompletionDate,
+         @CSAgesEligible,
+         @CSAgesEligibleMoreOrLess,
+         @CSSexesEligible,
+         @CSAcceptsHealthyVolunteers,
+         @CSIsVerrified,
+         @CSIsVerrifiedBy,
+         @CSIPDStatement,
+         @ShareIPD,
+         @CSFDADrugProduct,
+         @CSFDADeviceProduct,
+         @CSProductUSA,
+         @Keywordsprovidedby,
+         @SponserID,
+         1,
+         @IsPublish,
+         @IsDeleted
+        )
+
+        --CSSearchKeyWord
+        INSERT INTO tblSiteCSSearchKeyword
+        (
+            SearchKeywordGuid,
+            SearchKeywordText,
+            CSGuiD,
+            OrderNo,
+            IsActive,
+            IsPublish,
+            IsDeleted
+        )
+        select NEWID(),
+               SearchKeywordText,
+               @CSGuiD,
+               0,
+               1,
+               IsPublish,
+               IsDeleted
+        from @CsSearchKeyword
+
+        --CSOutcomeMeasures
+        INSERT INTO tblSiteCSOutcomeMeasures
+        (
+            CSOutcomeMeasuresGuiD,
+            CSPrimarySecondary,
+            CSOutcomeMeasuresText,
+            CSGuiD,
+            OrderNo,
+            IsActive,
+            IsPublish,
+            IsDeleted
+        )
+        select NEWID(),
+               CSPrimarySecondary,
+               CSOutcomeMeasuresText,
+               @CSGuiD,
+               OrderNo,
+               1,
+               IsPublish,
+               IsDeleted
+        from @CsOutcomeMeasures
+
+        --CSLocation
+        INSERT INTO tblSiteCSLocation
+        (
+            CSLocationGuiD,
+            CSLocationAddress1,
+            CSLocationAddress2,
+            CSLocationPhone1,
+            CSLocationPhone2,
+            CSLocationEmailAddress1,
+            CSLocationEmailAddress2,
+            CSLocationName,
+            CSLocationZip,
+            CSGuiD,
+            OrderNo,
+            IsActive,
+            IsPublish,
+            IsDeleted
+        )
+        select NEWID(),
+               CSLocationAddress1,
+               CSLocationAddress2,
+               CSLocationPhone1,
+               CSLocationPhone2,
+               CSLocationEmailAddress1,
+               CSLocationEmailAddress2,
+               CSLocationName,
+               CSLocationZip,
+               @CSGuiD,
+               OrderNo,
+               1,
+               IsPublish,
+               IsDeleted
+        from @CSLocation
+
+        -- CSCriteria
+        INSERT INTO tblSiteCSCriteria
+        (
+            CSCriteriaGuid,
+            CSInclusionExclusion,
+            CSCriteriaText,
+            CSGuiD,
+            OrderNo,
+            IsActive,
+            IsPublish,
+            IsDeleted
+        )
+        select NEWID(),
+               CSInclusionExclusion,
+               CSCriteriaText,
+               @CSGuiD,
+               OrderNo,
+               1,
+               IsPublish,
+               IsDeleted
+        from @CSCriteria
+
+        --CSContact
+        INSERT INTO tblSiteCSContact
+        (
+            CSContactGuiD,
+            CSContactFirstName,
+            CSContactMiddleName,
+            CSContactLastName,
+            CSContactPhone1,
+            CSContactPhone2,
+            CSContactEmailAddress1,
+            CSContactEmailAddress2,
+            CSContactAddress1,
+            CSContactAddress2,
+            CSGuiD,
+            OrderNo,
+            IsActive,
+            IsPublish,
+            IsDeleted,
+			[CountryID],
+			[StateName]
+        )
+        select NEWID(),
+               CSContactFirstName,
+               CSContactMiddleName,
+               CSContactLastName,
+               CSContactPhone1,
+               CSContactPhone2,
+               CSContactEmailAddress1,
+               CSContactEmailAddress2,
+               CSContactAddress1,
+               CSContactAddress2,
+               @CSGuiD,
+               OrderNo,
+               1,
+               IsPublish,
+               IsDeleted,
+			   CountryID,
+			   StateName
+        from @CSContact
+
+        -- CSConditionOrDisease
+        INSERT INTO tblSiteCSConditionOrDisease
+        (
+            CSConditionOrDiseaseGuID,
+            CSConditionOrDisease,
+            CSConditionOrDiseaseText,
+            CSGuiD,
+            OrderNo,
+            IsActive,
+            IsPublish,
+            IsDeleted
+        )
+        select NEWID(),
+               CSConditionOrDisease,
+               CSConditionOrDiseaseText,
+               @CSGuiD,
+               OrderNo,
+               1,
+               IsPublish,
+               IsDeleted
+        from @CSConditionOrDisease
+
+        --CSArmsInterventions
+        INSERT INTO tblSiteCSArmsInterventions
+        (
+            CSArmsInterventionsGuID,
+            CSArmsOrIntervention,
+            CSArmsInterventionsText,
+            CSGuiD,
+            OrderNo,
+            IsActive,
+            IsPublish,
+            IsDeleted
+        )
+        SELECT NEWID(),
+               CSArmsOrIntervention,
+               CSArmsInterventionsText,
+               @CSGuiD,
+               OrderNo,
+               1,
+               IsPublish,
+               IsDeleted
+        FROM @CSArmsInterventions
+
+        --CSPhase
+        INSERT INTO tblSiteCSPhase
+        (
+            CSPhaseGuID,
+            CSPhaseText,
+            CSGuiD,
+            OrderNo,
+            IsActive,
+            IsPublish,
+            IsDeleted
+        )
+        SELECT NEWID(),
+               CSPhaseText,
+               @CSGuiD,
+               OrderNo,
+               1,
+               IsPublish,
+               IsDeleted
+        FROM @CSPhase
+
+        --CSInterventionOrTreatment
+        INSERT INTO tblSiteCSInterventionOrTreatment
+        (
+            CSInterventionOrTreatmentGuID,
+            CSInterventionOrTreatment,
+            CSInterventionOrTreatmentText,
+            CSGuiD,
+            OrderNo,
+			IsActive,
+			IsDelete
+        )
+        SELECT NEWID(),
+               CSInterventionOrTreatment,
+               CSInterventionOrTreatmentText,
+               @CSGuiD,
+               OrderNo,
+			   1,
+			   0
+        FROM @CSInterventionOrTreatment
+
+        set @ReturnCode = '200'
+
+        COMMIT TRAN
+
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRAN
+
+        DECLARE @ErrorMessage NVARCHAR(4000);
+        DECLARE @ErrorSeverity INT;
+        DECLARE @ErrorState INT;
+
+        SELECT @ErrorMessage = ERROR_MESSAGE(),
+               @ErrorSeverity = ERROR_SEVERITY(),
+               @ErrorState = ERROR_STATE();
+
+        RAISERROR(   @ErrorMessage,  -- Message text.
+                     @ErrorSeverity, -- Severity.
+                     @ErrorState     -- State.
+                 );
+    END CATCH;
+END
+
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+Create procedure [dbo].[USP_SiteUpdateStudyWithChild]
+		   @CSCode varchar(30)='',
+           @CSTitle varchar(1000)='',
+           @CSShortDescription varchar(300)='',
+           @CSInformationProvider bigint=0,
+           @CSDescription nvarchar(max)='',
+           @CSStudyType int=0,
+           @CSActualEnrollment varchar(30)='',
+           @CSAllocation varchar(150)='',
+           @CSInterventionMode varchar(150)='',
+           @CSMasking varchar(150)='',
+           @CSPrimaryPurpose varchar(150)='',
+           @CSOfficialTitle varchar(1000)='',
+           @CSActualStartDate datetime=null,
+           @CSEstPrimaryCompletionDate datetime=null,
+           @CSEstStudyCompletionDate datetime=null,
+           @CSAgesEligible int=0,
+           @CSAgesEligibleMoreOrLess int=0,
+           @CSSexesEligible int=0,
+           @CSAcceptsHealthyVolunteers int=0,
+           @CSIsVerrified int=0,
+           @CSIsVerrifiedBy varchar(150)='',
+           @CSIPDStatement varchar(500)='',
+           @ShareIPD int=0,
+           @CSFDADrugProduct int=0,
+           @CSFDADeviceProduct int=0,
+           @CSProductUSA int=0,
+           @Keywordsprovidedby bigint=0,
+           @SponserID bigint=0,
+           @IsActive bit=0,
+           @IsPublish bit=0,
+           @IsDeleted bit=0,
+		   @CSGuiD uniqueidentifier,
+		   @CsSearchKeyword tmpSiteCsSearchKeyword ReadOnly,
+		   @CsOutcomeMeasures tmpSiteCsOutcomeMeasures ReadOnly,
+		   @CSLocation tmpSiteCSLocation ReadOnly,
+		   @CSCriteria tmpSiteCSCriteria ReadOnly,
+		   @CSContact tmpSiteCSContact ReadOnly,
+		   @CSConditionOrDisease tmpSiteCSConditionOrDisease ReadOnly,
+		   @CSArmsInterventions tmpSiteCSArmsInterventions ReadOnly,
+		   @CSPhase tmpSiteCSPhase ReadOnly,
+		   @CSInterventionOrTreatment tmpSiteCSInterventionOrTreatment ReadOnly,
+		   @ReturnCode NVARCHAR(20) OUTPUT
+AS
+Declare @csCodeValue varchar(30);  
+BEGIN
+    BEGIN TRAN
+    BEGIN TRY
+        -- SET NOCOUNT ON added to prevent extra result sets from
+        -- interfering with SELECT statements.
+        SET NOCOUNT ON; 
+
+	set @csCodeValue = (select top 1 CSCode FROM [dbo].[tblSiteCSDetails] WHERE CSGuiD = @CSGuiD);	
+
+	UPDATE tblSiteCSDetails
+	   SET 
+		  CSCode = @csCodeValue, 
+		  CSTitle = @CSTitle, 
+		  CSShortDescription = @CSShortDescription,
+		  CSInformationProvider = @CSInformationProvider,
+		  CSDescription = @CSDescription, 
+		  CSStudyType = @CSStudyType, 
+		  CSActualEnrollment = @CSActualEnrollment, 
+		  CSAllocation = @CSAllocation, 
+		  CSInterventionMode = @CSInterventionMode, 
+		  CSMasking = @CSMasking, 
+		  CSPrimaryPurpose = @CSPrimaryPurpose, 
+		  CSOfficialTitle = @CSOfficialTitle, 
+		  CSActualStartDate = @CSActualStartDate, 
+		  CSEstPrimaryCompletionDate = @CSEstPrimaryCompletionDate, 
+		  CSEstStudyCompletionDate = @CSEstStudyCompletionDate, 
+		  CSAgesEligible = @CSAgesEligible, 
+		  CSAgesEligibleMoreOrLess = @CSAgesEligibleMoreOrLess,
+		  CSSexesEligible = @CSSexesEligible, 
+		  CSAcceptsHealthyVolunteers = @CSAcceptsHealthyVolunteers, 
+		  CSIsVerrified = @CSIsVerrified, 
+		  CSIsVerrifiedBy = @CSIsVerrifiedBy, 
+		  CSIPDStatement = @CSIPDStatement, 
+		  ShareIPD = @ShareIPD, 
+		  CSFDADrugProduct = @CSFDADrugProduct,
+		  CSFDADeviceProduct = @CSFDADeviceProduct, 
+		  CSProductUSA = @CSProductUSA,
+		  Keywordsprovidedby = @Keywordsprovidedby,
+		  SponserID = @SponserID, 
+		  IsActive = @IsActive,
+		  IsPublish = @IsPublish,
+		  IsDeleted = @IsDeleted
+	 WHERE CSGuiD = @CSGuiD
+
+	  --CSSearchKeyWord
+
+		   delete from tblSiteCSSearchKeyword where CSGuiD = @CSGuiD 
+		   INSERT INTO tblSiteCSSearchKeyword
+           (SearchKeywordGuid
+           ,SearchKeywordText
+           ,CSGuiD
+           ,OrderNo
+           ,IsActive
+           ,IsPublish
+           ,IsDeleted)
+   select 
+           NEWID(), 
+           SearchKeywordText, 
+           @CSGuiD, 
+           0, 
+           IsActive, 
+           IsPublish, 
+           IsDeleted
+		   from
+		   @CsSearchKeyword
+
+	--CSOutcomeMeasures
+
+		  delete from tblSiteCSOutcomeMeasures where CSGuiD = @CSGuiD 
+		  INSERT INTO tblSiteCSOutcomeMeasures
+           (CSOutcomeMeasuresGuiD
+           ,CSPrimarySecondary
+           ,CSOutcomeMeasuresText
+           ,CSGuiD
+           ,OrderNo
+           ,IsActive
+           ,IsPublish
+           ,IsDeleted)
+     select
+           NEWID(), 
+           CSPrimarySecondary,
+           CSOutcomeMeasuresText, 
+           @CSGuiD, 
+           OrderNo, 
+           IsActive,
+           IsPublish, 
+           IsDeleted
+		   from 
+		   @CsOutcomeMeasures
+
+	--CSLocation
+		   delete from tblSiteCSLocation where CSGuiD = @CSGuiD 
+		   INSERT INTO tblSiteCSLocation
+           (CSLocationGuiD
+           ,CSLocationAddress1
+           ,CSLocationAddress2
+           ,CSLocationPhone1
+           ,CSLocationPhone2
+           ,CSLocationEmailAddress1
+           ,CSLocationEmailAddress2
+           ,CSLocationName
+           ,CSLocationZip
+           ,CSGuiD
+           ,OrderNo
+           ,IsActive
+           ,IsPublish
+           ,IsDeleted)
+     select 
+           NEWID(), 
+           CSLocationAddress1, 
+           CSLocationAddress2, 
+           CSLocationPhone1, 
+           CSLocationPhone2, 
+           CSLocationEmailAddress1, 
+           CSLocationEmailAddress2, 
+           CSLocationName, 
+           CSLocationZip,
+           @CSGuiD, 
+           OrderNo, 
+           IsActive,
+           IsPublish,
+           IsDeleted
+		   from 
+		   @CSLocation
+
+    -- CSCriteria
+		   delete from tblSiteCSCriteria where CSGuiD = @CSGuiD 
+		   INSERT INTO tblSiteCSCriteria
+           (CSCriteriaGuid
+           ,CSInclusionExclusion
+           ,CSCriteriaText
+           ,CSGuiD
+           ,OrderNo
+           ,IsActive
+           ,IsPublish
+           ,IsDeleted)
+     select
+			NEWID()
+           ,CSInclusionExclusion
+           ,CSCriteriaText
+           ,@CSGuiD
+           ,OrderNo
+           ,IsActive
+           ,IsPublish
+           ,IsDeleted
+		   from @CSCriteria
+		  
+	--CSContact
+		   delete from tblSiteCSContact where CSGuiD = @CSGuiD 
+		   INSERT INTO tblSiteCSContact
+           (CSContactGuiD
+           ,CSContactFirstName
+           ,CSContactMiddleName
+           ,CSContactLastName
+           ,CSContactPhone1
+           ,CSContactPhone2
+           ,CSContactEmailAddress1
+           ,CSContactEmailAddress2
+           ,CSContactAddress1
+           ,CSContactAddress2
+           ,CSGuiD
+           ,OrderNo
+           ,IsActive
+           ,IsPublish
+           ,IsDeleted
+		   ,[CountryID]
+		   ,[StateName])
+     select
+          
+           NEWID(), 
+           CSContactFirstName, 
+           CSContactMiddleName, 
+           CSContactLastName, 
+           CSContactPhone1, 
+           CSContactPhone2, 
+           CSContactEmailAddress1, 
+           CSContactEmailAddress2, 
+           CSContactAddress1, 
+           CSContactAddress2, 
+           @CSGuiD, 
+           OrderNo, 
+           IsActive, 
+           IsPublish, 
+           IsDeleted,
+		   [CountryID],
+		   [StateName]
+		   from @CSContact
+  
+	-- CSConditionOrDisease
+		   delete from tblSiteCSConditionOrDisease where CSGuiD = @CSGuiD 
+		   INSERT INTO tblSiteCSConditionOrDisease
+           (CSConditionOrDiseaseGuID
+           ,CSConditionOrDisease
+           ,CSConditionOrDiseaseText
+           ,CSGuiD
+           ,OrderNo
+           ,IsActive
+           ,IsPublish
+           ,IsDeleted)
+     select
+            
+           NEWID(), 
+           CSConditionOrDisease,
+           CSConditionOrDiseaseText, 
+           @CSGuiD, 
+           OrderNo, 
+           IsActive, 
+           IsPublish,
+           IsDeleted
+		   from @CSConditionOrDisease
+		
+	--CSArmsInterventions
+		   delete from tblSiteCSArmsInterventions where CSGuiD = @CSGuiD 
+		   INSERT INTO tblSiteCSArmsInterventions
+           (CSArmsInterventionsGuID
+           ,CSArmsOrIntervention
+           ,CSArmsInterventionsText
+           ,CSGuiD
+           ,OrderNo
+           ,IsActive
+           ,IsPublish
+           ,IsDeleted)
+     SELECT
+           
+           NEWID(),
+           CSArmsOrIntervention, 
+           CSArmsInterventionsText, 
+           @CSGuiD, 
+           OrderNo,
+           IsActive, 
+           IsPublish, 
+           IsDeleted
+		   FROM
+		   @CSArmsInterventions
+		
+	 --CSPhase
+		   delete from tblSiteCSPhase where CSGuiD = @CSGuiD 
+		    INSERT INTO tblSiteCSPhase
+           (CSPhaseGuID
+           ,CSPhaseText
+           ,CSGuiD
+           ,OrderNo
+           ,IsActive
+           ,IsPublish
+           ,IsDeleted)
+     SELECT
+           NEWID(), 
+           CSPhaseText, 
+           @CSGuiD, 
+           OrderNo, 
+           IsActive, 
+           IsPublish,
+           IsDeleted
+		   FROM
+		   @CSPhase
+		 
+		
+
+	  --CSInterventionOrTreatment
+		   delete from tblSiteCSInterventionOrTreatment where CSGuiD = @CSGuiD 
+		   INSERT INTO tblSiteCSInterventionOrTreatment
+           (CSInterventionOrTreatmentGuID
+           ,CSInterventionOrTreatment
+           ,CSInterventionOrTreatmentText
+           ,CSGuiD
+           ,OrderNo)
+     SELECT
+           
+           NEWID(), 
+           CSInterventionOrTreatment, 
+           CSInterventionOrTreatmentText, 
+           @CSGuiD, 
+           OrderNo
+		   FROM
+		   @CSInterventionOrTreatment
+
+
+     
+
+		   set @ReturnCode = '200'
+
+		COMMIT TRAN
+
+    END TRY
+	 BEGIN CATCH
+        ROLLBACK TRAN
+
+        DECLARE @ErrorMessage NVARCHAR(4000);
+        DECLARE @ErrorSeverity INT;
+        DECLARE @ErrorState INT;
+
+        SELECT @ErrorMessage = ERROR_MESSAGE(),
+               @ErrorSeverity = ERROR_SEVERITY(),
+               @ErrorState = ERROR_STATE();
+
+        RAISERROR(   @ErrorMessage,  -- Message text.
+                     @ErrorSeverity, -- Severity.
+                     @ErrorState     -- State.
+                 );
+    END CATCH;
+END
+
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+Create PROCEDURE [dbo].[USP_SiteActiveInactiveStudy]
+@CSGuiD uniqueidentifier,
+@ReturnCode NVARCHAR(20) OUTPUT
+AS
+Declare @Status bit;
+BEGIN
+BEGIN TRAN
+BEGIN TRY
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+		BEGIN
+		 Select top 1
+                *
+            into ##temp
+            from [dbo].[tblSiteCSDetails] CSD
+            where CSD.CSGuiD = @CSGuiD
+
+            Select @Status = IsActive
+            from ##temp
+
+			 if (@Status = 1)
+            BEGIN
+                Update [dbo].[tblSiteCSDetails]
+                SET IsActive = 0
+                where CSGuiD = @CSGuiD
+                set @ReturnCode = '200'
+            END
+            ELSE
+            BEGIN
+                Update [dbo].[tblSiteCSDetails]
+                SET IsActive = 1
+                where CSGuiD = @CSGuiD
+                set @ReturnCode = '200'
+            END
+
+            DROP TABLE ##temp;
+
+		END
+		 
+COMMIT TRAN
+END TRY
+BEGIN CATCH
+ROLLBACK TRAN
+
+    DECLARE @ErrorMessage NVARCHAR(4000);
+    DECLARE @ErrorSeverity INT;
+    DECLARE @ErrorState INT;
+
+    SELECT @ErrorMessage = ERROR_MESSAGE(),
+           @ErrorSeverity = ERROR_SEVERITY(),
+           @ErrorState = ERROR_STATE();
+    
+    RAISERROR (@ErrorMessage, -- Message text.
+               @ErrorSeverity, -- Severity.
+               @ErrorState -- State.
+               );
+END CATCH;
+END
+
+
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+  
+-- exec [dbo].[USP_CSDetailsSearch] '',''
+  
+create PROCEDURE [dbo].[USP_SiteCSDetailsSearch] 
+     
+
+	@CSTitle nvarchar(1000),  
+    @CSConditionOrDiseaseText nvarchar(300),
+	@CSLocation varchar(200),
+	@IsActive bit
+	--@CSActualStartDate DateTime
+ 
+AS    
+BEGIN 
+   IF (
+	   @CSTitle ='' AND
+	   @CSConditionOrDiseaseText = '' AND
+	   @CSLocation = '' AND
+	   @IsActive = null
+	   --@CSActualStartDate = null
+	   ) 
+  BEGIN  
+ SELECT  
+    [CSStudyID] ,
+	CD.[CSGuiD] ,
+	[CSCode],
+	[CSTitle] ,
+	[CSShortDescription],
+	[CSInformationProvider],
+	[CSDescription] ,
+	[CSStudyType] ,
+	[CSActualEnrollment] ,
+	[CSAllocation],
+	[CSInterventionMode],
+	[CSMasking],
+	[CSPrimaryPurpose],
+	[CSOfficialTitle],
+	[CSActualStartDate],
+	[CSEstPrimaryCompletionDate],
+	[CSEstStudyCompletionDate],
+	[CSAgesEligible],
+	[CSAgesEligibleMoreOrLess],
+	[CSSexesEligible],
+	[CSAcceptsHealthyVolunteers],
+	[CSIsVerrified],
+	[CSIsVerrifiedBy],
+	[CSIPDStatement],
+	[ShareIPD],
+	[CSFDADrugProduct],
+	[CSFDADeviceProduct],
+	[CSProductUSA],
+	[Keywordsprovidedby],
+	[SponserID],
+	CL.CSLocationName,
+	CSD.CSConditionOrDiseaseText   
+	from [dbo].[tblSiteCSDetails]  CD 
+	INNER JOIN [dbo].[tblSiteCSLocation] CL  ON CL.CSGuiD = CD.CSGuiD
+	INNER JOIN [dbo].[tblSiteCSConditionOrDisease] CSD ON CSD.CSGuiD = CD.CSGuiD
+    where CD.[IsDeleted] = 0
+	order by [CSStudyID] desc;
+
+  END  
+  ELSE  
+  BEGIN    
+    SELECT  
+    [CSStudyID] ,
+	iv.[CSGuiD] ,
+	[CSCode],
+	[CSTitle] ,
+	[CSShortDescription],
+	[CSInformationProvider],
+	[CSDescription] ,
+	[CSStudyType] ,
+	[CSActualEnrollment] ,
+	[CSAllocation],
+	[CSInterventionMode],
+	[CSMasking],
+	[CSPrimaryPurpose],
+	[CSOfficialTitle],
+	[CSActualStartDate],
+	[CSEstPrimaryCompletionDate],
+	[CSEstStudyCompletionDate],
+	[CSAgesEligible],
+	[CSAgesEligibleMoreOrLess],
+	[CSSexesEligible],
+	[CSAcceptsHealthyVolunteers],
+	[CSIsVerrified],
+	[CSIsVerrifiedBy],
+	[CSIPDStatement],
+	[ShareIPD],
+	[CSFDADrugProduct],
+	[CSFDADeviceProduct],
+	[CSProductUSA],
+	[Keywordsprovidedby],
+	[SponserID],
+	iv.IsPublish,
+	iv.IsActive,
+	CL.CSLocationName,
+	CSD.CSConditionOrDiseaseText    
+  from [dbo].[tblSiteCSDetails] iv    
+  INNER JOIN [dbo].[tblSiteCSLocation] CL  ON CL.CSGuiD = iv.CSGuiD
+  JOIN  [dbo].[tblSiteCSConditionOrDisease] CSD on CSD.CSGuiD = iv.CSGuiD
+  where [CSTitle] LIKE '%' +  COALESCE(NULLIF(@CSTitle, ''), [CSTitle])+ '%'
+  AND CSD.[CSConditionOrDiseaseText] LIKE '%' +  COALESCE(NULLIF(@CSConditionOrDiseaseText, ''), CSD.[CSConditionOrDiseaseText])+ '%'
+  AND CL.[CSLocationName] LIKE '%' +  COALESCE(NULLIF(@CSLocation, ''), CL.[CSLocationName])+ '%'
+  AND iv.IsActive = @IsActive
+ --AND iv.CSActualStartDate BETWEEN COALESCE(NULLIF(@CSActualStartDate, DATEADD(year,-10,GETDATE())),iv.CSActualStartDate) and DATEADD(DAY,1,GETDATE())
+ -- AND iv.CSActualStartDate between COALESCE(NULLIF(@CSActualStartDate, DATEADD(DD,-7,GETDATE())),iv.CSActualStartDate) AND GETDATE() 
+  AND iv.[IsDeleted] = 0
+	order by [CSStudyID] desc;
+   END     
+  
+  END
+  
+  
+  
+  
+  SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- select * from tblCSSearchKeyword 
+--exec USP_GETStudyByCSGuID 'F3908898-362D-4499-9E24-DB9FD898F1C7'
+
+Create procedure [dbo].[USP_SiteGetStudyByCSGuID]
+@CSGuiD uniqueidentifier
+AS
+BEGIN
+	BEGIN
+	--tblCSSearchKeyword
+	SELECT SearchKeywordGuid
+      ,SearchKeywordText
+      ,CSGuiD
+      ,OrderNo
+      ,IsActive
+      ,IsPublish
+      ,IsDeleted
+  FROM tblSiteCSSearchKeyword SearchKeyword
+  where SearchKeyword.CSGuiD=@CSGuiD
+
+	--tmpCSPhase
+	SELECT CSPhaseID 
+      ,CSPhaseGuID
+      ,CSPhaseText
+      ,CSGuiD
+      ,OrderNo
+      ,IsActive
+      ,IsPublish
+      ,IsDeleted
+  FROM tblSiteCSPhase PHASE
+  where PHASE.CSGuiD=@CSGuiD
+
+  --tmpCSLocation
+  SELECT CSLocationId
+      ,CSLocationGuiD
+      ,CSLocationAddress1
+      ,CSLocationAddress2
+      ,CSLocationPhone1
+      ,CSLocationPhone2
+      ,CSLocationEmailAddress1
+      ,CSLocationEmailAddress2
+      ,CSLocationName
+      ,CSLocationZip
+      ,CSGuiD
+      ,OrderNo
+      ,IsActive
+      ,IsPublish
+      ,IsDeleted
+  FROM tblSiteCSLocation Loc
+  where Loc.CSGuiD=@CSGuiD
+
+  --tmpCsOutcomeMeasures
+SELECT CSOutcomeMeasuresId
+      ,CSOutcomeMeasuresGuiD
+      ,CSPrimarySecondary
+      ,CSOutcomeMeasuresText
+      ,CSGuiD
+      ,OrderNo
+      ,IsActive
+      ,IsPublish
+      ,IsDeleted
+  FROM tblSiteCSOutcomeMeasures CSOUTMEASURE
+  where CSOUTMEASURE.CSGuiD=@CSGuiD
+
+  --tmpCSConditionOrDisease
+  SELECT CSConditionOrDiseaseID
+      ,CSConditionOrDiseaseGuID
+      ,CSConditionOrDisease
+      ,CSConditionOrDiseaseText
+      ,CSGuiD
+      ,OrderNo
+      ,IsActive
+      ,IsPublish
+      ,IsDeleted
+  FROM tblSiteCSConditionOrDisease CSCond
+  where CSCond.CSGuiD=@CSGuiD
+
+  --tmpCSArmsInterventions
+
+  SELECT CSArmsInterventionsID
+      ,CSArmsInterventionsGuID
+      ,CSArmsOrIntervention
+      ,CSArmsInterventionsText
+      ,CSGuiD
+      ,OrderNo
+      ,IsActive
+      ,IsPublish
+      ,IsDeleted
+  FROM tblSiteCSArmsInterventions CSArms
+  WHERE CSArms.CSGuiD=@CSGuiD
+
+  --tmpCSCriteria
+  
+SELECT CSCriteriaId
+      ,CSCriteriaGuid
+      ,CSInclusionExclusion
+      ,CSCriteriaText
+      ,CSGuiD
+      ,OrderNo
+      ,IsActive
+      ,IsPublish
+      ,IsDeleted
+  FROM tblSiteCSCriteria CSCrit
+  WHERE CSCrit.CSGuiD=@CSGuiD
+
+  --tmpCSContact
+  
+SELECT CSContactId
+      ,CSContactGuiD
+      ,CSContactFirstName
+      ,CSContactMiddleName
+      ,CSContactLastName
+      ,CSContactPhone1
+      ,CSContactEmailAddress1
+      ,CSContactAddress1
+      ,CSGuiD
+      ,OrderNo
+      ,IsActive
+      ,IsPublish
+      ,IsDeleted
+	  ,CountryID
+	  ,StateName
+  FROM tblSiteCSContact CSCont
+	WHERE CSCont.CSGuiD=@CSGuiD
+	--tbCSInterventionOrTreatment
+	SELECT CSInterventionOrTreatmentID
+      ,CSInterventionOrTreatmentGuID
+      ,CSInterventionOrTreatment
+      ,CSInterventionOrTreatmentText
+      ,CSGuiD
+      ,OrderNo
+  FROM tblSiteCSInterventionOrTreatment CSIntervOrTreatment
+  WHERE CSIntervOrTreatment.CSGuiD=@CSGuiD
+
+  select * from [dbo].[tblSiteCSDetails] CSD where CSD.CSGuiD = @CSGuiD
+
+
+
+		END
+END
+
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+Create procedure [dbo].[USP_SiteGetStudyList]
+AS
+BEGIN
+	BEGIN
+	SELECT [CSStudyID]
+      ,CD.[CSGuiD]
+      ,[CSCode]
+      ,[CSTitle]
+      ,[CSShortDescription]
+      ,[CSInformationProvider]
+      ,[CSDescription]
+      ,[CSStudyType]
+      ,[CSActualEnrollment]
+      ,[CSAllocation]
+      ,[CSInterventionMode]
+      ,[CSMasking]
+      ,[CSPrimaryPurpose]
+      ,[CSOfficialTitle]
+      ,[CSActualStartDate]
+      ,[CSEstPrimaryCompletionDate]
+      ,[CSEstStudyCompletionDate]
+      ,[CSAgesEligible]
+      ,[CSAgesEligibleMoreOrLess]
+      ,[CSSexesEligible]
+      ,[CSAcceptsHealthyVolunteers]
+      ,[CSIsVerrified]
+      ,[CSIsVerrifiedBy]
+      ,[CSIPDStatement]
+      ,[ShareIPD]
+      ,[CSFDADrugProduct]
+      ,[CSFDADeviceProduct]
+      ,[CSProductUSA]
+      ,[Keywordsprovidedby]
+      ,[SponserID]
+      ,CD.[IsActive]
+      ,CD.[IsPublish]
+      ,CD.[IsDeleted]
+	  ,CL.CSLocationName
+	  ,CSD.CSConditionOrDiseaseText
+  FROM [dbo].[tblSiteCSDetails] CD
+  	INNER JOIN [dbo].[tblSiteCSLocation] CL  ON CL.CSGuiD = CD.CSGuiD
+	INNER JOIN [dbo].[tblSiteCSConditionOrDisease] CSD ON CSD.CSGuiD = CD.CSGuiD
+	where CD.IsDeleted = 0
+	END
+END
+
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- select * from tblSiteCSInventory where IsActive = 1 
+-- exec [dbo].[USP_SiteSearchInventory] 'dr','BD8A5A11-6D69-4216-A68F-CF6CD79E708A'
+    
+Create PROCEDURE [dbo].[USP_SiteSearchInventory]
+ @Search nvarchar(max),
+ @CSGuiD uniqueidentifier
+AS
+BEGIN  
+ IF (@Search is NULL OR @Search='' )
+  BEGIN
+    SELECT CSInventoryGuiD,
+	[InventoryType],
+	[InventoryCode],
+	[InventoryName],
+	[InventoryAvailableQuantity]
+      ,CSGuiD
+      ,OrderNo
+      ,IsActive
+      ,IsPublish
+      ,IsDeleted
+  FROM tblSiteCSInventory Inventory
+  where Inventory.CSGuiD = @CSGuiD AND IsActive = 1 and IsDeleted = 0
+  END
+  ELSE
+  BEGIN
+  SELECT CSInventoryGuiD,
+	[InventoryType],
+	[InventoryCode],
+	[InventoryName],
+	[InventoryAvailableQuantity]
+      ,CSGuiD
+      ,OrderNo
+      ,IsActive
+      ,IsPublish
+      ,IsDeleted
+  FROM tblSiteCSInventory Inventory
+  where  Inventory.CSGuiD = @CSGuiD AND IsActive = 1 and IsDeleted = 0
+	And (Inventory.InventoryName LIKE '%' + @Search + '%' 
+        OR Inventory.InventoryCode LIKE '%' + @Search + '%')
+		
+  END
+END
+
+
+
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================      
+-- Author:      <NiteshKumar Sukalikar>      
+-- Create date: <25/5/2020>      
+-- Description: <Return user by Id>      
+-- exec [dbo].[USP_SiteDeleteInventory] '1'  
+
+-- =============================================      
+Create PROCEDURE [dbo].[USP_SiteDeleteInventory] 
+@Id uniqueidentifier
+AS
+BEGIN
+
+  IF (@Id is null)
+  BEGIN
+    RETURN
+  END
+  ELSE
+  BEGIN
+  Update tblSiteCSInventory
+  SET IsActive = 0 , IsDeleted = 1
+  FROM tblSiteCSInventory Inventory
+  where Inventory.CSInventoryGuiD=@Id
+
+  END
+END
+
+
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================      
+-- Author:      <NiteshKumar Sukalikar>      
+-- Create date: <25/5/2020>      
+-- Description: <Return user by Id>      
+-- exec [dbo].[USP_SiteGetInventoryRecord] '1'  
+
+-- =============================================      
+Create PROCEDURE [dbo].[USP_SiteGetInventoryRecord] 
+@Id uniqueidentifier
+AS
+BEGIN
+
+  IF (@Id is null)
+  BEGIN
+    RETURN
+  END
+  ELSE
+  BEGIN
+  
+	 SELECT	  CSInventoryGuiD,
+	[InventoryType],
+	[InventoryCode],
+	[InventoryName],
+	[InventoryAvailableQuantity]
+      ,CSGuiD
+      ,OrderNo
+      ,IsActive
+      ,IsPublish
+      ,IsDeleted
+      FROM tblSiteCSInventory Inventory
+  where Inventory.CSInventoryGuiD=@Id
+
+  END
+END
+
+
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================        
+-- Author:      <Nitesh sukalikar>        
+-- UpdatedBy : <Nitesh sukalikar>   
+-- Create date: <2/17/2022> 
+-- exec [USP_SiteGetCodesList] 1,'1'
+-- =============================================        
+Create PROCEDURE [dbo].[USP_SiteGetCodesList]   
+@Type int,
+@CodeType NVARCHAR(20) OUTPUT
+AS    
+BEGIN  
+BEGIN TRY
+
+	if(@Type = 1)
+	 BEGIN  	
+	 select 
+		[HCPCId] as Id,
+		[HCPC] as Code,
+		[SHORT_DESCRIPTION] as Name,
+		[LONG_DESCRIPTION] as LongDescription
+		from [dbo].[tblSiteMasterHCPCCodes]
+	 END 
+
+	 ELSE
+	 BEGIN	
+	 select 
+		[NDCId] as Id,
+		[ProductNdc] As Code,
+		[ProductTypeName] as Name
+		from [dbo].tblSiteMasterNDCCodes	
+	 END
+   
+END TRY
+ BEGIN CATCH
+	SELECT
+	ERROR_NUMBER() AS ErrorNumber
+	,ERROR_SEVERITY() AS ErrorSeverity
+	,ERROR_STATE() AS ErrorState
+	,ERROR_PROCEDURE() AS ErrorProcedure
+	,ERROR_LINE() AS ErrorLine
+	,ERROR_MESSAGE() AS ErrorMessage;
+END CATCH
+END
+
+
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- select * from  tblSiteCSInventory
+--exec USP_SiteGetStudyInventoryByCSGuID 'BD8A5A11-6D69-4216-A68F-CF6CD79E708A'
+
+Create procedure [dbo].[USP_SiteGetStudyInventoryByCSGuID]
+@CSGuiD uniqueidentifier
+AS
+BEGIN
+	BEGIN
+	--tblCSInventory
+	SELECT CSInventoryGuiD,
+	[InventoryType],
+	[InventoryCode],
+	[InventoryName],
+	[InventoryAvailableQuantity]
+      ,CSGuiD
+      ,OrderNo
+      ,IsActive
+      ,IsPublish
+      ,IsDeleted
+  FROM tblSiteCSInventory Inventory
+  where Inventory.CSGuiD=@CSGuiD and IsActive = 1
+
+		END
+END
+
+
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+Create procedure [dbo].[USP_SiteUpdateStudyInventory]
+	--@CSGuiD uniqueidentifier,
+	@CSInventoryGuiD uniqueidentifier,
+	@InventoryType int,
+	@InventoryName varchar(2000),
+	@InventoryCode nvarchar(200),
+	@InventoryAvaiableQuantity int,
+    --@CsInventory tmpCSInventory ReadOnly,
+    @ReturnCode NVARCHAR(20) OUTPUT
+AS
+  
+BEGIN
+    BEGIN TRAN
+    BEGIN TRY
+        -- SET NOCOUNT ON added to prevent extra result sets from
+        -- interfering with SELECT statements.
+        SET NOCOUNT ON; 
+
+
+	  --CSInventory
+
+		   --delete from [dbo].[tblCSInventory] where CSGuiD = @CSGuiD 
+		  UPDATE tblSiteCSInventory
+		  SET
+		  InventoryType = @InventoryType,
+		  InventoryName = @InventoryName,
+		  InventoryAvailableQuantity =  @InventoryAvaiableQuantity,
+		  InventoryCode = @InventoryCode
+     
+		  where CSInventoryGuiD = @CSInventoryGuiD
+
+		   set @ReturnCode = '200'
+
+		COMMIT TRAN
+
+    END TRY
+	 BEGIN CATCH
+        ROLLBACK TRAN
+
+        DECLARE @ErrorMessage NVARCHAR(4000);
+        DECLARE @ErrorSeverity INT;
+        DECLARE @ErrorState INT;
+
+        SELECT @ErrorMessage = ERROR_MESSAGE(),
+               @ErrorSeverity = ERROR_SEVERITY(),
+               @ErrorState = ERROR_STATE();
+
+        RAISERROR(   @ErrorMessage,  -- Message text.
+                     @ErrorSeverity, -- Severity.
+                     @ErrorState     -- State.
+                 );
+    END CATCH;
+END
+
+
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================    
+-- Author:  <Author,,Name>    
+-- Create date: <Create Date,,>    
+-- Description: <Description,,>    
+-- select * from tblAccountInvites    
+-- exec [dbo].[USP_SiteGetUserDetailsForProfile] 'C94D7A84-6923-4CD4-98EE-1C60BA91C0B9','200'  
+-- =============================================    
+Create PROCEDURE [dbo].[USP_SiteGetUserDetailsForProfile]    
+@AccountGUID nvarchar(max),    
+@ReturnCode NVARCHAR(20) OUTPUT    
+AS      
+BEGIN    
+BEGIN TRAN    
+BEGIN TRY    
+ -- SET NOCOUNT ON added to prevent extra result sets from    
+ -- interfering with SELECT statements.    
+ SET NOCOUNT ON;    
+    
+  BEGIN    
+    
+  Select     
+   [dbo].[UDF_StringDecryptor](iv.FirstName) as FirstName,    
+   [dbo].[UDF_StringDecryptor](iv.LastName) as LastName,    
+   [dbo].[UDF_StringDecryptor](iv.EmailAddress) as Email,    
+   iv.AccountInviteGuid as UserGuid,    
+   [dbo].[UDF_StringDecryptor](iv.FirstName) + '-00' + CONVERT(NVARCHAR,  US.UserID)  as UserCode,  
+   iv.IsActive,  
+   iv.IsBlocked,  
+   iv.IsDeleted,  
+   iv.[InviteAccept],  
+   iv.[IsStaff],  
+   iv.InviteSentDate as InviteDate, 
+   [dbo].[UDF_StringDecryptor](USP.[MiddleName]) as MiddleName,  
+   [dbo].[UDF_StringDecryptor](USP.MaidenName) as MaidenName,  
+   [dbo].[UDF_StringDecryptor](iv.DepartmentName) as OtherName,  
+   [dbo].[UDF_StringDecryptor](US.UserName) as UserName,  
+   USP.GenderId,  
+   USP.MaritalStatusId,  
+   USP.NativeSpokenLanguage,  
+   USP.CountryID,  
+   USP.StateName,  
+   US.UserID,  
+   US.[LastLogin],
+   [dbo].[UDF_StringDecryptor](USP.Age) as Age,  
+   [dbo].[UDF_StringDecryptor](USP.DOB) as DOB,  
+   [dbo].[UDF_StringDecryptor](USP.PrimaryContactNumber) as PrimaryContactNumber,  
+   [dbo].[UDF_StringDecryptor](USP.SecondaryContactNumber) as SecondaryContactNumber,  
+   ProfilePicture,
+   ORG.OrganizationName,
+   ORG.BusinessName,
+   ORG.SubDomainName  
+  from tblSiteAccountInvites IV 
+  JOIN [dbo].[tblSiteUsers] US on US.AccountInviteGuid = IV.AccountInviteGuid 
+  Join tblSiteOrganization ORG On ORG.OrganizationID = IV.OrganizationsID
+  LEFT JOIN [dbo].[tblSiteUserProfiles] USP on USP.UserID = US.UserID
+  Where IV.AccountInviteGuid = @AccountGUID    
+    
+  END    
+       
+COMMIT TRAN    
+END TRY    
+BEGIN CATCH    
+ROLLBACK TRAN    
+    
+    DECLARE @ErrorMessage NVARCHAR(4000);    
+    DECLARE @ErrorSeverity INT;    
+    DECLARE @ErrorState INT;    
+    
+    SELECT @ErrorMessage = ERROR_MESSAGE(),    
+           @ErrorSeverity = ERROR_SEVERITY(),    
+           @ErrorState = ERROR_STATE();    
+        
+    RAISERROR (@ErrorMessage, -- Message text.    
+               @ErrorSeverity, -- Severity.    
+               @ErrorState -- State.    
+               );    
+END CATCH;    
+END     
+
+
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+Create procedure [dbo].[USP_SiteAddStudyInventory]
+	@CSGuiD uniqueidentifier,
+    @CsInventory tmpSiteCSInventory ReadOnly,
+    @ReturnCode NVARCHAR(20) OUTPUT
+AS
+BEGIN
+
+    BEGIN TRAN
+    BEGIN TRY
+        -- SET NOCOUNT ON added to prevent extra result sets from
+        -- interfering with SELECT statements.
+        SET NOCOUNT ON;      
+
+        --tblCSInventory
+        INSERT INTO tblSiteCSInventory
+        (
+            [CSInventoryGuiD],           
+		    [InventoryType],
+            [InventoryCode],
+			[InventoryName],
+            [InventoryAvailableQuantity],
+            CSGuiD,
+            OrderNo,
+            IsActive,
+            IsPublish,
+            IsDeleted
+        )
+        select NEWID(),			
+			 [InventoryType],
+			 [InventoryCode],
+			 [InventoryName],
+			 [InventoryAvailableQuantity],
+               @CSGuiD,
+               0,
+               1,
+               IsPublish,
+               IsDeleted
+        from @CsInventory
+
+        set @ReturnCode = '200'
+
+        COMMIT TRAN
+
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRAN
+
+        DECLARE @ErrorMessage NVARCHAR(4000);
+        DECLARE @ErrorSeverity INT;
+        DECLARE @ErrorState INT;
+
+        SELECT @ErrorMessage = ERROR_MESSAGE(),
+               @ErrorSeverity = ERROR_SEVERITY(),
+               @ErrorState = ERROR_STATE();
+
+        RAISERROR(   @ErrorMessage,  -- Message text.
+                     @ErrorSeverity, -- Severity.
+                     @ErrorState     -- State.
+                 );
+    END CATCH;
+END
+
+USE [SDSurgeyLink]
+GO
+/****** Object:  UserDefinedFunction [dbo].[UDF_StringDecryptor]    Script Date: 2/28/2022 3:15:49 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+Create FUNCTION [dbo].[UDF_StringDecryptor](@encryp varbinary(8000))
+RETURNS nvarchar(4000)
+AS
+BEGIN
+DECLARE @decript varbinary(4000),@key nvarchar(max)= '(#2O21@5GLINK)'
+SET @decript = DECRYPTBYPASSPHRASE(@key,@encryp)
+RETURN (@decript)
+END
+GO
+/****** Object:  UserDefinedFunction [dbo].[UDF_StringEncryptor]    Script Date: 2/28/2022 3:15:49 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+Create FUNCTION [dbo].[UDF_StringEncryptor](@decrypt nvarchar(4000))
+RETURNS varbinary(4000)
+AS
+BEGIN
+DECLARE @encrypt varbinary(4000),@key nvarchar(max)= '(#2O21@5GLINK)'
+SET @encrypt = ENCRYPTBYPASSPHRASE(@key,@decrypt)
+RETURN (@encrypt)
+END
+GO
+
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================    
+-- Author:  <Author,,Name>    
+-- Create date: <Create Date,,>    
+-- Description: <Description,,>    
+-- select * from tblAccountInvites    
+-- exec [dbo].[USP_SiteUpdateUserProfileDetails] '27E03FA1-9B78-4C9F-8072-38F0233EE6AE','200'  
+-- =============================================    
+Create PROCEDURE [dbo].[USP_SiteUpdateUserProfileDetails]  
+    @FirstName nvarchar(max),  
+    @LastName nvarchar(max),  
+   -- @OtherName nvarchar(max),  
+    @MaidenName nvarchar(max),  
+    @MiddleName nvarchar(max),  
+    @GenderId smallint,  
+    @MaritalStatusId int,  
+    @Age nvarchar(max),  
+    @NativeSpokenLanguage nvarchar(50),  
+    @DOB nvarchar(max),  
+    @PrimaryContactNumber nvarchar(max),  
+    @SecondaryContactNumber nvarchar(max),  
+    @CountryID int,  
+    @StateName nvarchar(200),  
+    @ProfilePicture nvarchar(300) = '',  
+    @UserID bigint,  
+    @AccountID nvarchar(max),  
+    @Email nvarchar(max),  
+    @SponsorID bigint,  
+	@OrganizationName nvarchar(200),
+	@BusinessName nvarchar(200),
+    @ReturnCode NVARCHAR(20) OUTPUT  
+AS  
+BEGIN  
+    BEGIN TRAN  
+    BEGIN TRY  
+        -- SET NOCOUNT ON added to prevent extra result sets from    
+        -- interfering with SELECT statements.    
+        SET NOCOUNT ON;  
+  
+        BEGIN  
+  
+            if (@UserID is null or @UserID = 0)  
+            BEGIN  
+                set @ReturnCode = '500'  
+                return  
+            END  
+            ELSE  
+            BEGIN  
+
+			--Update [dbo].[tblOrganization]
+			-- SET OrganizationName = @OrganizationsName,
+			--	BusinessName = @BusinessName 
+			--	WHERE  OrganizationID = @id
+  
+                Update [dbo].[tblSiteAccountInvites]  
+                SET FirstName = [dbo].[Udf_stringEncryptor](@FirstName),  
+                    LastName = [dbo].[Udf_stringEncryptor](@LastName) 
+     --DepartmentName = [dbo].[Udf_stringEncryptor](@OtherName)  
+                Where AccountInviteGuid = @AccountID  
+  
+                IF NOT EXISTS  
+                (  
+                    SELECT top 1  
+                        *  
+                    from [tblSiteUserProfiles]  
+                    where UserID = @UserID  
+                )  
+                BEGIN  
+                    INSERT INTO [dbo].[tblSiteUserProfiles]  
+                    (  
+                        [UserProfileGuid],  
+                        [FirstName],  
+                        [MiddleName],  
+                        [LastName],  
+                        [MaidenName],  
+                     --   [OtherName],  
+                        [UserID],  
+                        [GenderId],  
+                        [MaritalStatusId],  
+                        [NativeSpokenLanguage],  
+                        [CreatedByLoginID],  
+                        [IsActive],  
+                        [IsDeleted],  
+                        [StateName],  
+                        [CountryID],  
+                        [Age],  
+                        [DOB],  
+                        [EmailAddress],  
+                        [PrimaryContactNumber],  
+                        [SecondaryContactNumber],  
+                        [ProfilePicture]						  
+                    )  
+                    VALUES  
+                    (NEWID(),  
+                     [dbo].[Udf_stringEncryptor](@FirstName),  
+                     [dbo].[Udf_stringEncryptor](@MiddleName),  
+                     [dbo].[Udf_stringEncryptor](@LastName),  
+                     [dbo].[Udf_stringEncryptor](@MaidenName),  
+                    -- [dbo].[Udf_stringEncryptor](@OtherName),  
+                     @UserID,  
+                     @GenderId,  
+                     @MaritalStatusId,  
+                     @NativeSpokenLanguage,  
+                     @SponsorID,  
+                     1  ,  
+                     0  ,  
+                     @StateName,  
+                     @CountryID,  
+                     [dbo].[Udf_stringEncryptor](@Age),  
+                     [dbo].[Udf_stringEncryptor](@DOB),  
+                     [dbo].[Udf_stringEncryptor](@Email),  
+                     [dbo].[Udf_stringEncryptor](@PrimaryContactNumber),  
+                     [dbo].[Udf_stringEncryptor](@SecondaryContactNumber),  
+                     @ProfilePicture  
+                    )  
+                    set @ReturnCode = '200'  
+            END  
+                ELSE  
+                BEGIN  
+                    Update [dbo].[tblSiteUserProfiles]  
+                    SET FirstName = [dbo].[Udf_stringEncryptor](@FirstName),  
+                        LastName = [dbo].[Udf_stringEncryptor](@LastName),  
+                        MiddleName = [dbo].[Udf_stringEncryptor](@MiddleName),  
+                        MaidenName = [dbo].[Udf_stringEncryptor](@MaidenName),  
+                       -- OtherName = [dbo].[Udf_stringEncryptor](@LastName),  
+                        EmailAddress = [dbo].[Udf_stringEncryptor](@Email),  
+                        GenderId = @GenderId,  
+                        MaritalStatusId = @MaritalStatusId,  
+                        NativeSpokenLanguage = @NativeSpokenLanguage,  
+                        CountryID = @CountryID,  
+                        StateName = @StateName,  
+                        Age = [dbo].[Udf_stringEncryptor](@Age),  
+                        DOB = [dbo].[Udf_stringEncryptor](@DOB),  
+                        PrimaryContactNumber = [dbo].[Udf_stringEncryptor](@PrimaryContactNumber),  
+                        SecondaryContactNumber = [dbo].[Udf_stringEncryptor](@SecondaryContactNumber),  
+                        ProfilePicture = @ProfilePicture  
+                    where UserID = @UserID  
+  
+                    set @ReturnCode = '200'  
+                END  
+            END  
+        END  
+  
+        COMMIT TRAN  
+    END TRY  
+    BEGIN CATCH  
+        ROLLBACK TRAN  
+  
+        DECLARE @ErrorMessage NVARCHAR(4000);  
+        DECLARE @ErrorSeverity INT;  
+        DECLARE @ErrorState INT;  
+  
+        SELECT @ErrorMessage = ERROR_MESSAGE(),  
+               @ErrorSeverity = ERROR_SEVERITY(),  
+               @ErrorState = ERROR_STATE();  
+  
+        RAISERROR(   @ErrorMessage,  -- Message text.    
+                     @ErrorSeverity, -- Severity.    
+                     @ErrorState     -- State.    
+                 );  
+    END CATCH;  
+END  
+
+GO
+
+
+USE [SLSiteLocal1]
+GO
+/****** Object:  StoredProcedure [dbo].[USP_SiteGetOrganization_StaffInvite_List]    Script Date: 3/15/2022 12:44:35 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- select * from [tblSiteAccountInvites]
+--exec [dbo].[USP_SiteGetOrganization_StaffInvite_List] 3,false,'200'  
+  
+Create PROCEDURE [dbo].[USP_SiteGetOrganization_ParticipantInvite_List]      
+    @OrganizationID bigint,      
+	@InviteFlag bit,
+   @ReturnCode NVARCHAR(20) OUTPUT      
+ AS      
+      
+BEGIN      
+    BEGIN TRAN      
+    BEGIN TRY      
+	if(@InviteFlag = 1)
+	BEGIN
+	SELECT       
+  iv.[AccountInviteGuid],      
+  [dbo].[UDF_StringDecryptor](iv.[FirstName]) as FirstName,      
+  [dbo].[UDF_StringDecryptor](iv.[LastName]) as LastName,      
+  [dbo].[UDF_StringDecryptor](iv.[EmailAddress]) as Email,      
+  iv.AccountInviteGuid as StaffGuid,        
+  iv.[InviteSentDate],      
+  iv.[InviteAccept],
+  iv.IsActive,
+  iv.IsDeleted,
+  --CR.RoleID as InitialRoleID,    
+  --US.organizationId    
+  MR.RoleName    
+  from [dbo].[tblSiteAccountInvites] iv    
+  join [dbo].[tblSiteUsers] US on US.[AccountInviteGuid]=iv.[AccountInviteGuid]     
+  join [dbo].[tblSiteUIChildUserRoleAssign] CR on US.[UserID] = CR.[UserID]    
+  join [dbo].[tblSiteMasterRoles] MR on CR.[RoleID] = MR.[RoleID]     
+  where  iv.OrganizationsID = @OrganizationID
+  and iv.[IsStaff] = 0
+  and iv.InviteAccept = @InviteFlag
+  AND (iv.IsDeleted IS NULL or iv.IsDeleted = 0) order by iv.InviteSentDate desc;       
+      
+  set @ReturnCode = '200'    
+	END
+	ELSE
+	BEGIN
+	SELECT       
+  iv.[AccountInviteGuid],      
+  [dbo].[UDF_StringDecryptor](iv.[FirstName]) as FirstName,      
+  [dbo].[UDF_StringDecryptor](iv.[LastName]) as LastName,      
+  [dbo].[UDF_StringDecryptor](iv.[EmailAddress]) as Email,      
+  iv.AccountInviteGuid as StaffGuid,        
+  iv.[InviteSentDate],      
+  iv.[InviteAccept],
+  iv.IsActive,
+  iv.IsDeleted
+  --CR.RoleID as InitialRoleID,    
+  --US.organizationId    
+ -- MR.RoleName    
+  from [dbo].[tblSiteAccountInvites] iv    
+  --join [dbo].[tblUsers] US on US.[AccountInviteGuid]=iv.[AccountInviteGuid]     
+  --join [dbo].[tblUIChildUserRoleAssign] CR on US.[UserID] = CR.[UserID]    
+  --join [dbo].[tblMasterRoles] MR on CR.[RoleID] = MR.[RoleID]     
+  where  iv.OrganizationsID = @OrganizationID and iv.[IsStaff]= 0
+  and iv.InviteAccept = @InviteFlag
+  AND iv.IsActive = 1
+  order by iv.InviteSentDate desc;       
+      
+  set @ReturnCode = '200'    
+	END
+          
+      
+  COMMIT TRAN        
+    END TRY      
+    BEGIN CATCH      
+        ROLLBACK TRAN      
+      
+        DECLARE @ErrorMessage NVARCHAR(4000);      
+        DECLARE @ErrorSeverity INT;      
+        DECLARE @ErrorState INT;      
+      
+        SELECT @ErrorMessage = ERROR_MESSAGE(),      
+               @ErrorSeverity = ERROR_SEVERITY(),      
+               @ErrorState = ERROR_STATE();      
+      
+        RAISERROR(   @ErrorMessage,  -- Message text.      
+                     @ErrorSeverity, -- Severity.      
+                     @ErrorState     -- State.      
+                 );      
+    END CATCH;      
+END 
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+Create PROCEDURE [dbo].[USP_SiteDeleteParticipant]
+@AccountGUID nvarchar(max),
+@ReturnCode NVARCHAR(20) OUTPUT
+AS
+BEGIN
+BEGIN TRAN
+BEGIN TRY
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+		BEGIN
+
+   Update  [dbo].tblSiteAccountInvites
+   SET	   IsDeleted = 1 ,IsActive = 0
+   where   AccountInviteGuid = @AccountGUID
+		   set @ReturnCode='200'
+
+		END
+		 
+COMMIT TRAN
+END TRY
+BEGIN CATCH
+ROLLBACK TRAN
+
+    DECLARE @ErrorMessage NVARCHAR(4000);
+    DECLARE @ErrorSeverity INT;
+    DECLARE @ErrorState INT;
+
+    SELECT @ErrorMessage = ERROR_MESSAGE(),
+           @ErrorSeverity = ERROR_SEVERITY(),
+           @ErrorState = ERROR_STATE();
+    
+    RAISERROR (@ErrorMessage, -- Message text.
+               @ErrorSeverity, -- Severity.
+               @ErrorState -- State.
+               );
+END CATCH;
+END 
+
+
+USE [SLSiteLocal1]
+GO
+/****** Object:  StoredProcedure [dbo].[USP_SiteStaffSearch]    Script Date: 3/16/2022 11:31:04 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+  
+-- exec [dbo].[USP_SiteParticipantSearch] 'gautam','','',null,null,3,null,false  
+  
+Alter PROCEDURE [dbo].[USP_SiteParticipantSearch] 
+     
+ @FirstName nvarchar(200),  
+ @LastName nvarchar(200),  
+ @EmailAddress nvarchar(200),  
+ @StartDate datetime = null,  
+ @EndDate datetime = null, 
+ @OrganizationID bigint,
+ @IsActive bit = null,
+ @InviteAccept bit = null
+
+
+   -- @ReturnCode NVARCHAR(20) OUTPUT  
+AS    
+BEGIN 
+   IF (@FirstName = '' AND @LastName='' AND @EmailAddress='' AND @StartDate is null  AND @EndDate is null AND @InviteAccept is null AND @IsActive is null) 
+  BEGIN  
+ SELECT  
+  [dbo].[UDF_StringDecryptor](iv.FirstName) as FirstName,  
+  [dbo].[UDF_StringDecryptor](iv.LastName) as LastName,  
+  [dbo].[UDF_StringDecryptor](iv.EmailAddress) as Email,  
+  iv.AccountInviteGuid as StaffGuid,  
+  iv.IsActive,iv.InviteSentDate as InviteSend,iv.[InviteAccept],  
+  iv.ChildOrganizationID,iv.IsStaff,  
+   iv.[InviteSentDate]
+    --CR.RoleID as InitialRoleID,
+  --iv.InitialRoleID
+  --FROM [dbo].[tblAccountInvites] iv   
+  --where iv.OrganizationsID= @OrganizationID  
+
+    from [dbo].[tblSiteAccountInvites] iv     
+  --join [dbo].[tblAccountInvites] iv on US.[AccountInviteGuid]=iv.[AccountInviteGuid]   
+  --join [dbo].[tblUIChildUserRoleAssign] CR on US.[UserID] = CR.[UserID]  
+  --join [dbo].[tblMasterRoles] MR on CR.[RoleID] = MR.[RoleID]  
+
+ -- and iv.IsDeleted is null 
+  where iv.ChildOrganizationID is null  
+  and iv.IsStaff = 0
+  and iv.InviteAccept = @InviteAccept
+  order by iv.InviteSentDate desc;
+
+  END  
+  ELSE  
+  BEGIN   
+
+  if(@InviteAccept = 1)
+  BEGIN
+   SELECT  
+      [dbo].[UDF_StringDecryptor](iv.FirstName) as FirstName,  
+	  [dbo].[UDF_StringDecryptor](iv.LastName) as LastName,  
+	  [dbo].[UDF_StringDecryptor](iv.EmailAddress) as Email,  
+	  iv.AccountInviteGuid as StaffGuid,  
+	  iv.IsActive,
+	  iv.IsDeleted,
+	  iv.InviteSentDate,
+	  iv.[InviteAccept],
+	  iv.InitialRoleID,
+	  iv.ChildOrganizationID,
+	  iv.IsStaff,
+	  MR.RoleName,iv.[InviteSentDate],  
+	  CR.RoleID as InitialRoleID
+  --FROM [dbo].[tblAccountInvites] iv   
+  
+  from [dbo].[tblSiteAccountInvites] iv     
+  join [dbo].[tblSiteUsers] US on US.[AccountInviteGuid]=iv.[AccountInviteGuid]   
+  join [dbo].[tblSiteUIChildUserRoleAssign] CR on US.[UserID] = CR.[UserID]  
+  join [dbo].[tblSiteMasterRoles] MR on CR.[RoleID] = MR.[RoleID]   
+ 
+       
+  where [dbo].[UDF_StringDecryptor](iv.FirstName) LIKE '%' +  COALESCE(NULLIF(@FirstName, ''), [dbo].[UDF_StringDecryptor](iv.FirstName))+ '%'   
+  AND [dbo].[UDF_StringDecryptor](iv.LastName) LIKE '%' +  COALESCE(NULLIF(@LastName, ''), [dbo].[UDF_StringDecryptor](iv.LastName))+ '%'   
+  AND [dbo].[UDF_StringDecryptor](iv.EmailAddress) LIKE '%' +  COALESCE(NULLIF(@EmailAddress, ''), [dbo].[UDF_StringDecryptor](iv.EmailAddress))+ '%'
+  AND iv.InviteSentDate BETWEEN COALESCE(NULLIF(@StartDate, DATEADD(year,-100,GETDATE())),iv.InviteSentDate) AND COALESCE(NULLIF(@EndDate,DATEADD(year,100,GETDATE())), iv.InviteSentDate)
+  
+
+ -- SELECT coalesce(null, cast(1 as bit)) 
+  AND iv.IsActive =  COALESCE(NULLIF(@IsActive, null),iv.IsActive)
+  --AND iv.IsActive =  COALESCE(NULLIF(@IsActive, null),iv.IsActive)
+  --AND iv.[InviteAccept] =  COALESCE(NULLIF(@InviteAccept, null),iv.[InviteAccept])
+  AND iv.InviteAccept = 1
+
+ --AND iv.OrganizationsID= @OrganizationID  
+ AND iv.OrganizationsID = @OrganizationID AND ( iv.IsDeleted IS NULL  OR iv.IsDeleted = 0 )
+ AND iv.ChildOrganizationID is null  and iv.IsStaff = 0
+  order by iv.InviteSentDate desc;  
+  END
+  ELSE 
+  BEGIN
+   SELECT  
+      [dbo].[UDF_StringDecryptor](iv.FirstName) as FirstName,  
+	  [dbo].[UDF_StringDecryptor](iv.LastName) as LastName,  
+	  [dbo].[UDF_StringDecryptor](iv.EmailAddress) as Email,  
+	  iv.AccountInviteGuid as StaffGuid,  
+	  iv.IsActive,
+	  iv.IsDeleted,
+	  iv.InviteSentDate,
+	  iv.[InviteAccept],
+	  --iv.InitialRoleID,
+	  iv.ChildOrganizationID,
+	  iv.IsStaff
+	  --MR.RoleName,iv.[InviteSentDate],  
+	  -- CR.RoleID as InitialRoleID
+  --FROM [dbo].[tblAccountInvites] iv   
+  
+  from [dbo].[tblSiteAccountInvites] iv     
+  --join [dbo].[tblAccountInvites] iv on US.[AccountInviteGuid]=iv.[AccountInviteGuid]   
+  --join [dbo].[tblUIChildUserRoleAssign] CR on US.[UserID] = CR.[UserID]  
+  --join [dbo].[tblMasterRoles] MR on CR.[RoleID] = MR.[RoleID]   
+ 
+       
+  where [dbo].[UDF_StringDecryptor](iv.FirstName) LIKE '%' +  COALESCE(NULLIF(@FirstName, ''), [dbo].[UDF_StringDecryptor](iv.FirstName))+ '%'   
+  AND [dbo].[UDF_StringDecryptor](iv.LastName) LIKE '%' +  COALESCE(NULLIF(@LastName, ''), [dbo].[UDF_StringDecryptor](iv.LastName))+ '%'   
+  AND [dbo].[UDF_StringDecryptor](iv.EmailAddress) LIKE '%' +  COALESCE(NULLIF(@EmailAddress, ''), [dbo].[UDF_StringDecryptor](iv.EmailAddress))+ '%'
+  AND iv.InviteSentDate BETWEEN COALESCE(NULLIF(@StartDate, DATEADD(year,-100,GETDATE())),iv.InviteSentDate) AND COALESCE(NULLIF(@EndDate,DATEADD(year,100,GETDATE())), iv.InviteSentDate)
+  
+
+ -- SELECT coalesce(null, cast(1 as bit)) 
+  AND iv.IsActive =  COALESCE(NULLIF(@IsActive, null),iv.IsActive)
+  --AND iv.IsActive =  COALESCE(NULLIF(@IsActive, null),iv.IsActive)
+  --AND iv.[InviteAccept] =  COALESCE(NULLIF(@InviteAccept, null),iv.[InviteAccept])
+  AND iv.InviteAccept = 0
+
+ --AND iv.OrganizationsID= @OrganizationID  
+ AND iv.OrganizationsID = @OrganizationID AND  ( iv.IsDeleted IS NULL  OR iv.IsDeleted = 0 )
+ AND iv.ChildOrganizationID is null  and iv.IsStaff = 0
+  order by iv.InviteSentDate desc;  
+  END
+
+  
+   
+   END     
+  
+  END
+
+
+USE [SLSiteLocal1]
+GO
+/****** Object:  StoredProcedure [dbo].[USP_SiteViewOrganization_Staff_InviteById]    Script Date: 3/16/2022 3:03:37 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- exec [dbo].[USP_SiteViewOrganization_Participant_InviteById] '9199d3ef-fdb2-482a-8acc-013e165891d1','200'
+
+Create PROCEDURE [dbo].[USP_SiteViewOrganization_Participant_InviteById]
+	  @AccountInviteGuid nvarchar(max),  
+	  @ReturnCode NVARCHAR(20) OUTPUT
+	AS
+
+BEGIN
+    BEGIN TRAN
+    BEGIN TRY
+        SELECT	
+		iv.[AccountInviteGuid],
+		[dbo].[UDF_StringDecryptor](iv.[FirstName]) as FirstName,
+		[dbo].[UDF_StringDecryptor](iv.[LastName]) as LastName,
+		[dbo].[UDF_StringDecryptor](iv.[EmailAddress]) as Email,
+		iv.IsActive,
+		iv.IsDeleted,
+		US.UserID
+		from [dbo].[tblSiteUsers] US	
+		join [dbo].[tblSiteAccountInvites] iv on US.[AccountInviteGuid]=iv.[AccountInviteGuid]
+		where  iv.AccountInviteGuid = @AccountInviteGuid AND US.AccountInviteGuid = iv.AccountInviteGuid AND US.[IsStaff]= 0
+
+		set @ReturnCode = '200'
+
+		COMMIT TRAN  
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRAN
+
+        DECLARE @ErrorMessage NVARCHAR(4000);
+        DECLARE @ErrorSeverity INT;
+        DECLARE @ErrorState INT;
+
+        SELECT @ErrorMessage = ERROR_MESSAGE(),
+               @ErrorSeverity = ERROR_SEVERITY(),
+               @ErrorState = ERROR_STATE();
+
+        RAISERROR(   @ErrorMessage,  -- Message text.
+                     @ErrorSeverity, -- Severity.
+                     @ErrorState     -- State.
+                 );
+    END CATCH;
+END
+
+
+USE [SLSiteLocal1]
+GO
+/****** Object:  StoredProcedure [dbo].[USP_SiteGetParticipantDetails]    Script Date: 3/16/2022 4:17:10 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================  
+-- Author:  <Author,,Name>  
+-- Create date: <Create Date,,>  
+-- Description: <Description,,>  
+-- select * from tblSiteAccountInvites  
+-- exec [dbo].[USP_SiteGetParticipantDetails] '9199d3ef-fdb2-482a-8acc-013e165891d1','200'
+-- =============================================  
+Create PROCEDURE [dbo].[USP_SiteGetParticipantDetails]  
+@AccountGUID nvarchar(max),  
+@ReturnCode NVARCHAR(20) OUTPUT  
+AS    
+BEGIN  
+BEGIN TRAN  
+BEGIN TRY  
+ -- SET NOCOUNT ON added to prevent extra result sets from  
+ -- interfering with SELECT statements.  
+ SET NOCOUNT ON;  
+  
+  BEGIN  
+  
+  Select   
+   [dbo].[UDF_StringDecryptor](iv.FirstName) as FirstName,  
+   [dbo].[UDF_StringDecryptor](iv.LastName) as LastName,  
+   [dbo].[UDF_StringDecryptor](iv.EmailAddress) as Email,  
+   iv.AccountInviteGuid as StaffGuid,  
+   [dbo].[UDF_StringDecryptor](iv.FirstName) + '-00' + CONVERT(NVARCHAR,  US.UserID)  as StaffCode,
+   iv.IsActive,
+   iv.IsBlocked,
+   iv.IsDeleted,
+   iv.[InviteAccept],
+   iv.[IsStaff],
+   iv.InviteSentDate as InviteDate,
+   [dbo].[UDF_StringDecryptor](USP.[MiddleName]) as MiddleName,
+   [dbo].[UDF_StringDecryptor](USP.MaidenName) as MaidenName,
+   [dbo].[UDF_StringDecryptor](iv.DepartmentName) as OtherName,
+   [dbo].[UDF_StringDecryptor](US.UserName) as UserName,
+   USP.GenderId,
+   USP.MaritalStatusId,
+   USP.NativeSpokenLanguage,
+   USP.CountryID,
+   USP.StateName,
+   US.UserID,
+   US.[LastLogin],
+   [dbo].[UDF_StringDecryptor](USP.Age) as Age,
+   [dbo].[UDF_StringDecryptor](USP.DOB) as DOB,
+   [dbo].[UDF_StringDecryptor](USP.PrimaryContactNumber) as PrimaryContactNumber,
+   [dbo].[UDF_StringDecryptor](USP.SecondaryContactNumber) as SecondaryContactNumber,
+   ProfilePicture 
+  from tblSiteAccountInvites IV  
+  JOIN [dbo].[tblSiteUsers] US on US.AccountInviteGuid = IV.AccountInviteGuid 
+  LEFT JOIN [dbo].[tblSiteUserProfiles] USP on USP.UserID = US.UserID 
+  Where IV.AccountInviteGuid = @AccountGUID  
+  
+  END  
+     
+COMMIT TRAN  
+END TRY  
+BEGIN CATCH  
+ROLLBACK TRAN  
+  
+    DECLARE @ErrorMessage NVARCHAR(4000);  
+    DECLARE @ErrorSeverity INT;  
+    DECLARE @ErrorState INT;  
+  
+    SELECT @ErrorMessage = ERROR_MESSAGE(),  
+           @ErrorSeverity = ERROR_SEVERITY(),  
+           @ErrorState = ERROR_STATE();  
+      
+    RAISERROR (@ErrorMessage, -- Message text.  
+               @ErrorSeverity, -- Severity.  
+               @ErrorState -- State.  
+               );  
+END CATCH;  
+END   
+  
+
+USE [SLSiteLocal1]
+GO
+/****** Object:  StoredProcedure [dbo].[USP_SiteActiveInactiveParticipant]    Script Date: 3/17/2022 9:50:28 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- Select * from [dbo].[tblSiteAccountInvites]
+-- =============================================
+Create PROCEDURE [dbo].[USP_SiteActiveInactiveParticipant]
+    @Id uniqueidentifier,
+    @ReturnCode NVARCHAR(20) OUTPUT
+AS
+Declare @Status bit;
+BEGIN
+    BEGIN TRAN
+    BEGIN TRY
+        -- SET NOCOUNT ON added to prevent extra result sets from
+        -- interfering with SELECT statements.
+        SET NOCOUNT ON;
+
+        BEGIN
+
+            Select top 1
+                *
+            into ##temp
+            from [dbo].[tblSiteAccountInvites] iv
+            where iv.AccountInviteGuid = @Id
+
+            Select @Status = IsActive
+            from ##temp
+
+            DROP TABLE ##temp;
+
+            if (@Status = 1)
+            BEGIN
+                Update [dbo].[tblSiteAccountInvites]
+                SET IsActive = 0
+                where AccountInviteGuid = @Id
+                set @ReturnCode = '200'
+            END
+            ELSE
+            BEGIN
+                Update [dbo].[tblSiteAccountInvites]
+                SET IsActive = 1
+                 where AccountInviteGuid = @Id
+                set @ReturnCode = '200'
+            END
+
+        END
+
+        COMMIT TRAN
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRAN
+
+        DECLARE @ErrorMessage NVARCHAR(4000);
+        DECLARE @ErrorSeverity INT;
+        DECLARE @ErrorState INT;
+
+        SELECT @ErrorMessage = ERROR_MESSAGE(),
+               @ErrorSeverity = ERROR_SEVERITY(),
+               @ErrorState = ERROR_STATE();
+
+        RAISERROR(   @ErrorMessage,  -- Message text.
+                     @ErrorSeverity, -- Severity.
+                     @ErrorState     -- State.
+                 );
+    END CATCH;
+END
+
+
+
+
+
+
+

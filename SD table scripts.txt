@@ -1,0 +1,1871 @@
+USE [SDSurgeyLink]
+GO
+/****** Object:  Table [dbo].[tbCSInterventionOrTreatment]    Script Date: 2/22/2022 11:47:32 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteCSInterventionOrTreatment](
+	[CSInterventionOrTreatmentID] [bigint] IDENTITY(1,1) NOT NULL,
+	[CSInterventionOrTreatmentGuID] [uniqueidentifier] NULL,
+	[CSInterventionOrTreatment] [int] NULL,
+	[CSInterventionOrTreatmentText] [varchar](2000) NULL,
+	[CSGuiD] [uniqueidentifier] NULL,
+	[OrderNo] [int] NULL,
+	[IsActive] [bit] NULL,
+	[IsDelete] [bit] NULL,
+ CONSTRAINT [PK__tbCSInte__DD56F8102A98965E] PRIMARY KEY CLUSTERED 
+(
+	[CSInterventionOrTreatmentID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tbCSPhase]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteCSPhase](
+	[CSPhaseID] [bigint] IDENTITY(1,1) NOT NULL,
+	[CSPhaseGuID] [uniqueidentifier] NULL,
+	[CSPhaseText] [varchar](20) NULL,
+	[CSGuiD] [uniqueidentifier] NULL,
+	[OrderNo] [int] NULL,
+	[IsActive] [bit] NULL,
+	[IsPublish] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+ CONSTRAINT [PK__tbCSPhas__DB3329C75348A9A6] PRIMARY KEY CLUSTERED 
+(
+	[CSPhaseID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblAccountInvites]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteAccountInvites](
+	[AccountInviteGuid] [uniqueidentifier] NOT NULL,
+	[OrganizationsID] [bigint] NOT NULL,
+	[InviteAccept] [bit] NULL,
+	[InviteSentBy] [int] NULL,
+	[InviteType] [int] NULL,
+	[EmailTemplateID] [int] NULL,
+	[IsBlocked] [bit] NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL,
+	[InviteSentDate] [datetime2](7) NOT NULL,
+	[InvitedURL] [nvarchar](max) NULL,
+	[FirstName] [varbinary](max) NULL,
+	[LastName] [varbinary](max) NULL,
+	[EmailAddress] [varbinary](max) NULL,
+	[InviteAcceptedDate] [datetime2](7) NULL,
+	[IsStaff] [bit] NULL,
+	[ChildOrganizationID] [bigint] NULL,
+	[InitialRoleID] [bigint] NULL,
+	[DepartmentName] [varbinary](max) NULL,
+ CONSTRAINT [PK_tblSiteAccountInvites] PRIMARY KEY CLUSTERED 
+(
+	[AccountInviteGuid] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblCallNotificationUsers]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteCallNotificationUsers](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[ConnectionId] [nvarchar](max) NULL,
+	[CreatedDate] [datetime2](7) NOT NULL,
+	[UpdatedDate] [datetime2](7) NULL,
+	[UserId] [int] NOT NULL,
+ CONSTRAINT [PK_SiteCallNotificationUsers] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblClinicalStudyAttachment]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteClinicalStudyAttachment](
+	[ClinicalStudyAttachmentID] [bigint] IDENTITY(1,1) NOT NULL,
+	[ClinicalStudyAttachmentGuid] [uniqueidentifier] NOT NULL,
+	[ClinicalStudyAttachmentName] [nvarchar](200) NOT NULL,
+	[ClinicalStudyAttachmentVersion] [nvarchar](200) NOT NULL,
+	[ClinicalStudyAttachmentStoredName] [nvarchar](200) NOT NULL,
+	[ClinicalStudyAttachmentUploadedBy] [nvarchar](200) NOT NULL,
+	[ClinicalStudyAttachmentComment] [nvarchar](200) NOT NULL,
+	[ClinicalStudyID] [bigint] NOT NULL,
+	[ClinicalStudyContractID] [bigint] NOT NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ClinicalStudyAttachmentID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblClinicalStudyContract]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteClinicalStudyContract](
+	[ClinicalStudyContractID] [bigint] IDENTITY(1,1) NOT NULL,
+	[ClinicalStudyContractGuid] [uniqueidentifier] NOT NULL,
+	[ClinicalStudyContractCode] [nvarchar](200) NULL,
+	[ClinicalStudyContractDescription] [nvarchar](max) NULL,
+	[ClinicalStudyContractOwner] [nvarchar](200) NOT NULL,
+	[ClinicalStudyContractWith] [nvarchar](200) NOT NULL,
+	[ClinicalStudyActionBy] [nvarchar](200) NOT NULL,
+	[ClinicalStudyActionType] [int] NOT NULL,
+	[ClinicalStudyContractType] [int] NOT NULL,
+	[ClinicalStudyID] [bigint] NOT NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL,
+ CONSTRAINT [PK_tblClinicalStudyContract] PRIMARY KEY CLUSTERED 
+(
+	[ClinicalStudyContractID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblClinicalStudyDrug]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteClinicalStudyDrug](
+	[ClinicalStudyDrugID] [bigint] IDENTITY(1,1) NOT NULL,
+	[ClinicalStudyDrugGuid] [uniqueidentifier] NOT NULL,
+	[ClinicalStudyDrugName] [nvarchar](200) NOT NULL,
+	[ClinicalStudyDrugCode] [nvarchar](200) NOT NULL,
+	[ClinicalStudyDrugQty] [int] NOT NULL,
+	[ClinicalStudyDrugProvidedBy] [nvarchar](200) NOT NULL,
+	[ClinicalStudyID] [bigint] NOT NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ClinicalStudyDrugID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblClinicalStudyInventory]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteClinicalStudyInventory](
+	[ClinicalStudyInvetoryID] [bigint] IDENTITY(1,1) NOT NULL,
+	[ClinicalStudyInvetoryGuid] [uniqueidentifier] NOT NULL,
+	[ClinicalStudyInvetoryName] [nvarchar](200) NOT NULL,
+	[ClinicalStudyInvetoryCode] [nvarchar](200) NOT NULL,
+	[ClinicalStudyInvetoryQty] [int] NOT NULL,
+	[ClinicalStudyInvetoryProvidedBy] [nvarchar](200) NOT NULL,
+	[ClinicalStudyID] [bigint] NOT NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ClinicalStudyInvetoryID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblClinicalStudyRoles]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteClinicalStudyRoles](
+	[ClinicalStudyRolesID] [bigint] IDENTITY(1,1) NOT NULL,
+	[ClinicalStudyRolesGuid] [uniqueidentifier] NOT NULL,
+	[ClinicalStudyRoleType] [int] NOT NULL,
+	[Status] [int] NOT NULL,
+	[ClinicalStudyID] [bigint] NOT NULL,
+	[UserID] [bigint] NOT NULL,
+	[IsActive] [bit] NULL,
+	[IsBlock] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ClinicalStudyRolesID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblCSArmsInterventions]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteCSArmsInterventions](
+	[CSArmsInterventionsID] [bigint] IDENTITY(1,1) NOT NULL,
+	[CSArmsInterventionsGuID] [uniqueidentifier] NULL,
+	[CSArmsOrIntervention] [int] NULL,
+	[CSArmsInterventionsText] [varchar](2000) NULL,
+	[CSGuiD] [uniqueidentifier] NULL,
+	[OrderNo] [int] NULL,
+	[IsActive] [bit] NULL,
+	[IsPublish] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+ CONSTRAINT [PK__tblCSArm__78559BAF705E0DB8] PRIMARY KEY CLUSTERED 
+(
+	[CSArmsInterventionsID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblCSConditionOrDisease]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteCSConditionOrDisease](
+	[CSConditionOrDiseaseID] [bigint] IDENTITY(1,1) NOT NULL,
+	[CSConditionOrDiseaseGuID] [uniqueidentifier] NULL,
+	[CSConditionOrDisease] [int] NULL,
+	[CSConditionOrDiseaseText] [varchar](2000) NULL,
+	[CSGuiD] [uniqueidentifier] NULL,
+	[OrderNo] [int] NULL,
+	[IsActive] [bit] NULL,
+	[IsPublish] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+ CONSTRAINT [PK__tblCSCon__F98B798B4DB7A68D] PRIMARY KEY CLUSTERED 
+(
+	[CSConditionOrDiseaseID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblCSContact]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteCSContact](
+	[CSContactId] [bigint] IDENTITY(1,1) NOT NULL,
+	[CSContactGuiD] [uniqueidentifier] NULL,
+	[CSContactFirstName] [varchar](50) NULL,
+	[CSContactMiddleName] [varchar](50) NULL,
+	[CSContactLastName] [varchar](50) NULL,
+	[CSContactPhone1] [varchar](20) NULL,
+	[CSContactPhone2] [varchar](20) NULL,
+	[CSContactEmailAddress1] [varchar](50) NULL,
+	[CSContactEmailAddress2] [varchar](50) NULL,
+	[CSContactAddress1] [varchar](200) NULL,
+	[CSContactAddress2] [varchar](200) NULL,
+	[CSGuiD] [uniqueidentifier] NULL,
+	[OrderNo] [int] NULL,
+	[IsActive] [bit] NULL,
+	[IsPublish] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[StateName] [nvarchar](200) NULL,
+	[CountryID] [int] NOT NULL,
+ CONSTRAINT [PK__tblCSCon__592E3E6C7F09E891] PRIMARY KEY CLUSTERED 
+(
+	[CSContactId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblCSCriteria]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteCSCriteria](
+	[CSCriteriaId] [bigint] IDENTITY(1,1) NOT NULL,
+	[CSCriteriaGuid] [uniqueidentifier] NULL,
+	[CSInclusionExclusion] [int] NULL,
+	[CSCriteriaText] [varchar](2000) NULL,
+	[CSGuiD] [uniqueidentifier] NULL,
+	[OrderNo] [int] NULL,
+	[IsActive] [bit] NULL,
+	[IsPublish] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+ CONSTRAINT [PK__tblCSCri__9C1942406C6B4105] PRIMARY KEY CLUSTERED 
+(
+	[CSCriteriaId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblCSDetails]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteCSDetails](
+	[CSStudyID] [bigint] IDENTITY(1,1) NOT NULL,
+	[CSGuiD] [uniqueidentifier] NULL,
+	[CSCode] [varchar](30) NULL,
+	[CSTitle] [varchar](1000) NULL,
+	[CSShortDescription] [varchar](300) NULL,
+	[CSInformationProvider] [bigint] NULL,
+	[CSDescription] [nvarchar](max) NULL,
+	[CSStudyType] [int] NULL,
+	[CSActualEnrollment] [varchar](30) NULL,
+	[CSAllocation] [varchar](150) NULL,
+	[CSInterventionMode] [varchar](150) NULL,
+	[CSMasking] [varchar](150) NULL,
+	[CSPrimaryPurpose] [varchar](150) NULL,
+	[CSOfficialTitle] [varchar](1000) NULL,
+	[CSActualStartDate] [datetime] NULL,
+	[CSEstPrimaryCompletionDate] [datetime] NULL,
+	[CSEstStudyCompletionDate] [datetime] NULL,
+	[CSAgesEligible] [int] NULL,
+	[CSAgesEligibleMoreOrLess] [int] NULL,
+	[CSSexesEligible] [int] NULL,
+	[CSAcceptsHealthyVolunteers] [int] NULL,
+	[CSIsVerrified] [int] NULL,
+	[CSIsVerrifiedBy] [varchar](150) NULL,
+	[CSIPDStatement] [varchar](500) NULL,
+	[ShareIPD] [int] NULL,
+	[CSFDADrugProduct] [int] NULL,
+	[CSFDADeviceProduct] [int] NULL,
+	[CSProductUSA] [int] NULL,
+	[Keywordsprovidedby] [bigint] NULL,
+	[SponserID] [bigint] NULL,
+	[IsActive] [bit] NULL,
+	[IsPublish] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+ CONSTRAINT [PK__tblCSDet__9D96D1C53DCA4D0E] PRIMARY KEY CLUSTERED 
+(
+	[CSStudyID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblCSInventory]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteCSInventory](
+	[CSInventoryId] [bigint] IDENTITY(1,1) NOT NULL,
+	[CSInventoryGuiD] [uniqueidentifier] NULL,
+	[InventoryType] [int] NULL,
+	[InventoryName] [varchar](2000) NULL,
+	[InventoryAvailableQuantity] [int] NULL,
+	[CSGuiD] [uniqueidentifier] NULL,
+	[OrderNo] [int] NULL,
+	[IsActive] [bit] NULL,
+	[IsPublish] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL,
+	[InventoryCode] [nvarchar](200) NULL,
+ CONSTRAINT [PK_tblCSInventory] PRIMARY KEY CLUSTERED 
+(
+	[CSInventoryId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblCSLocation]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteCSLocation](
+	[CSLocationId] [bigint] IDENTITY(1,1) NOT NULL,
+	[CSLocationGuiD] [uniqueidentifier] NULL,
+	[CSLocationAddress1] [varchar](200) NULL,
+	[CSLocationAddress2] [varchar](200) NULL,
+	[CSLocationPhone1] [varchar](20) NULL,
+	[CSLocationPhone2] [varchar](20) NULL,
+	[CSLocationEmailAddress1] [varchar](50) NULL,
+	[CSLocationEmailAddress2] [varchar](50) NULL,
+	[CSLocationName] [varchar](200) NULL,
+	[CSLocationZip] [varchar](20) NULL,
+	[CSGuiD] [uniqueidentifier] NULL,
+	[OrderNo] [int] NULL,
+	[IsActive] [bit] NULL,
+	[IsPublish] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+ CONSTRAINT [PK__tblCSLoc__AC95D6071FEF072D] PRIMARY KEY CLUSTERED 
+(
+	[CSLocationId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblCSOutcomeMeasures]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteCSOutcomeMeasures](
+	[CSOutcomeMeasuresId] [bigint] IDENTITY(1,1) NOT NULL,
+	[CSOutcomeMeasuresGuiD] [uniqueidentifier] NULL,
+	[CSPrimarySecondary] [int] NULL,
+	[CSOutcomeMeasuresText] [varchar](2000) NULL,
+	[CSGuiD] [uniqueidentifier] NULL,
+	[OrderNo] [int] NULL,
+	[IsActive] [bit] NULL,
+	[IsPublish] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+ CONSTRAINT [PK__tblCSOut__195CD8CA6571FE9D] PRIMARY KEY CLUSTERED 
+(
+	[CSOutcomeMeasuresId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblCSResourceLink]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteCSResourceLink](
+	[CSResourceLinkID] [bigint] NOT NULL,
+	[CSResourceLinkGuID] [uniqueidentifier] NULL,
+	[CSResourceLinkTitle] [varchar](500) NULL,
+	[CSResourceLinkURL] [varchar](2000) NULL,
+	[CSGuiD] [uniqueidentifier] NULL,
+	[OrderNo] [int] NULL,
+	[IsActive] [bit] NULL,
+	[IsPublish] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[CSResourceLinkID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblCSSearchKeyword]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteCSSearchKeyword](
+	[SearchKeywordGuid] [uniqueidentifier] NULL,
+	[SearchKeywordText] [varchar](50) NULL,
+	[CSGuiD] [uniqueidentifier] NULL,
+	[OrderNo] [int] NULL,
+	[IsActive] [bit] NULL,
+	[IsPublish] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[SearchKeywordId] [bigint] IDENTITY(1,1) NOT NULL,
+ CONSTRAINT [PK_tblCSSearchKeyword] PRIMARY KEY CLUSTERED 
+(
+	[SearchKeywordId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblCSStudyID]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteCSStudyID](
+	[ClinicalStudyID] [bigint] IDENTITY(1,1) NOT NULL,
+	[ClinicalStudyGuid] [uniqueidentifier] NOT NULL,
+	[ClinicalStudyCode] [nvarchar](200) NULL,
+	[ClinicalStudyShortDescription] [nvarchar](500) NULL,
+	[ClinicalStudyDescription] [nvarchar](max) NULL,
+	[ImportedFrom] [nvarchar](200) NULL,
+	[ClinicalStudyOwnerID] [int] NOT NULL,
+	[PublishDate] [datetime2](7) NULL,
+	[IsPublish] [bit] NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ClinicalStudyID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblCSStudySponsorCROInvite]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteCSStudySponsorCROInvite](
+	[CSStudySponsorCROInviteID] [bigint] IDENTITY(1,1) NOT NULL,
+	[CSStudySponsorCROInviteGuid] [uniqueidentifier] NULL,
+	[SponsorID] [bigint] NOT NULL,
+	[CROID] [bigint] NOT NULL,
+	[CSStudyStudyID] [bigint] NOT NULL,
+	[InviteSentDate] [datetime] NULL,
+	[InviteAcceptDate] [datetime] NULL,
+	[IsInviteAccept] [bit] NULL,
+	[IsActive] [bit] NULL,
+	[IsDelete] [bit] NULL,
+	[InviteMessage] [nvarchar](max) NULL,
+	[InviteStatusComment] [nvarchar](max) NULL,
+ CONSTRAINT [PK_tblSponsorInviteCRO] PRIMARY KEY CLUSTERED 
+(
+	[CSStudySponsorCROInviteID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblCSStudySponsorCROMsg]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteCSStudySponsorCROMsg](
+	[CSStudySponsorCROMsgID] [bigint] IDENTITY(1,1) NOT NULL,
+	[CSStudySponsorCROMsgGuid] [uniqueidentifier] NULL,
+	[StudySponsorCROInviteID] [bigint] NOT NULL,
+	[SponsorCROMessage] [nvarchar](max) NULL,
+	[CreatedOn] [datetime] NULL,
+	[MessageToId] [nvarchar](max) NULL,
+	[MessageFromId] [nvarchar](max) NULL,
+	[IsConsetFormComment] [bit] NULL,
+ CONSTRAINT [PK_tblSponsorInviteCRO_Msg] PRIMARY KEY CLUSTERED 
+(
+	[CSStudySponsorCROMsgID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblCSStudySponsorCROMsgAttachment]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteCSStudySponsorCROMsgAttachment](
+	[CSStudySponsorCROMsgAttachmentID] [bigint] IDENTITY(1,1) NOT NULL,
+	[CSStudySponsorCROMsgAttachmentGUID] [uniqueidentifier] NULL,
+	[CSStudySponsorCROInviteID] [bigint] NULL,
+	[CSSponsorCROMsgAttachmentFileName] [nvarchar](max) NULL,
+	[CSSponsorCROMsgAttachmentSaveName] [nvarchar](max) NULL,
+	[Ordering] [int] NULL,
+	[Extension] [nvarchar](50) NULL,
+	[IsConsentForm] [bit] NULL,
+ CONSTRAINT [PK_tblCSStudySponsorCROMsgAttachment] PRIMARY KEY CLUSTERED 
+(
+	[CSStudySponsorCROMsgAttachmentID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblDatabases]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteDatabases](
+	[DatabaseID] [bigint] IDENTITY(1,1) NOT NULL,
+	[DatabaseGuid] [uniqueidentifier] NOT NULL,
+	[ServerName] [nvarchar](200) NULL,
+	[ServerIP] [nvarchar](200) NULL,
+	[UserName] [nvarchar](200) NULL,
+	[Password] [nvarchar](200) NULL,
+	[OrganizationsID] [bigint] NOT NULL,
+	[IsBlocked] [bit] NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[DatabaseID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblDocumentCenter]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteDocumentCenter](
+	[DocumentCenterId] [bigint] IDENTITY(1,1) NOT NULL,
+	[DocumentCenterGUID] [uniqueidentifier] NULL,
+	[DocumentTitle] [nvarchar](250) NOT NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL,
+ CONSTRAINT [PK_tblDocumentCenter] PRIMARY KEY CLUSTERED 
+(
+	[DocumentCenterId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblDocumentCenterFile]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteDocumentCenterFile](
+	[DocumentCenterFileId] [bigint] IDENTITY(1,1) NOT NULL,
+	[DocumentCenterFileGUID] [uniqueidentifier] NULL,
+	[DocumentCenterOriginalFileName] [nvarchar](250) NOT NULL,
+	[DocumentCenterSaveFileName] [nvarchar](250) NOT NULL,
+	[DocumentCenterFileExtension] [varchar](10) NOT NULL,
+	[DocumentCenterFileVersion] [decimal](2, 1) NULL,
+	[DocumentCenterFileUploadedBy] [bigint] NULL,
+	[DocumentCenterFileUploadedDate] [datetime2](7) NULL,
+	[DocumentCenterFileCommentText] [varchar](1000) NOT NULL,
+	[DocumentCenterId] [bigint] NULL,
+	[DocumentCenterFileDownloadLink] [nvarchar](500) NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NOT NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL,
+ CONSTRAINT [PK_tblDocumentCenterFile] PRIMARY KEY CLUSTERED 
+(
+	[DocumentCenterFileId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblForgotPasswordRequest]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteForgotPasswordRequest](
+	[ForgotPasswordRequestGuid] [uniqueidentifier] NOT NULL,
+	[ForgotPasswordRequestToken] [varchar](50) NOT NULL,
+	[UserID] [int] NOT NULL,
+	[ForgotPasswordRequestExpiration] [datetime2](7) NULL,
+	[ForgotPasswordRequestStatus] [int] NOT NULL,
+	[IsBlocked] [bit] NULL,
+	[ForgotPasswordRequestedOn] [datetime2](7) NULL
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblInventories]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteInventories](
+	[InventoryID] [bigint] IDENTITY(1,1) NOT NULL,
+	[InventoryGuid] [uniqueidentifier] NOT NULL,
+	[InventoryName] [nvarchar](max) NULL,
+	[InventoryType] [int] NULL,
+	[InventoryMinimumQuantity] [int] NULL,
+	[InventoryAvailableQuantity] [int] NULL,
+	[InventoryHCPCSCode] [bigint] NULL,
+	[InventoryNDCCode] [bigint] NULL,
+	[InventoryAddedBy] [bigint] NULL,
+	[InventoryAddedDate] [datetime2](7) NULL,
+	[OrganizationID] [bigint] NOT NULL,
+	[InventoryIssuerName] [bigint] NULL,
+	[InventoryReturnedBy] [bigint] NULL,
+	[IsReturned] [bit] NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL,
+ CONSTRAINT [PK_tblInventories] PRIMARY KEY CLUSTERED 
+(
+	[InventoryID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblLogUsers]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteLogUsers](
+	[LogUserGuid] [uniqueidentifier] NOT NULL,
+	[LogDescription] [nvarchar](200) NOT NULL,
+	[ActivityCodeID] [int] NOT NULL,
+	[ModuleID] [int] NOT NULL,
+	[APICodeID] [int] NOT NULL,
+	[UserID] [bigint] NOT NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblLogUserSystem]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteLogUserSystem](
+	[LogUserSystemGuid] [uniqueidentifier] NOT NULL,
+	[SystemIPAddress] [nvarchar](255) NOT NULL,
+	[OrganizationsGuid] [varchar](50) NULL,
+	[OrganizationsToken] [nvarchar](255) NOT NULL,
+	[LogUserCreatedOn] [datetime2](7) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[LogUserSystemGuid] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblMasterActivity]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteMasterActivity](
+	[ActivityID] [bigint] IDENTITY(1,1) NOT NULL,
+	[ActivityGuid] [uniqueidentifier] NOT NULL,
+	[ActivityName] [nvarchar](200) NULL,
+	[ActivityCode] [nvarchar](200) NULL,
+	[ActivityDescription] [nvarchar](200) NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL,
+ CONSTRAINT [PK_tblMasterActivity] PRIMARY KEY CLUSTERED 
+(
+	[ActivityID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblMasterAPI]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteMasterAPI](
+	[APIID] [bigint] IDENTITY(1,1) NOT NULL,
+	[APIGuid] [uniqueidentifier] NOT NULL,
+	[APICode] [nvarchar](200) NULL,
+	[APIDescription] [nvarchar](200) NULL,
+	[ModuleID] [bigint] NOT NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL,
+ CONSTRAINT [PK_tblMasterAPI] PRIMARY KEY CLUSTERED 
+(
+	[APIID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblMasterCity]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteMasterCity](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](50) NULL,
+	[StateID] [int] NULL,
+ CONSTRAINT [PK_tblMasterCity] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblMasterCountry]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteMasterCountry](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](50) NULL,
+	[CountryCode] [varchar](5) NULL,
+ CONSTRAINT [PK_tblCountryMaster] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblMasterEmailTemplate]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteMasterEmailTemplate](
+	[EmailTemplateGuid] [uniqueidentifier] NOT NULL,
+	[EmailTemplateCode] [varchar](8) NULL,
+	[EmailTemplateName] [varchar](200) NULL,
+	[EmailTemplateDescription] [nvarchar](max) NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[EmailTemplateType] [int] NULL,
+	[EmailTemplateSenderName] [varchar](100) NULL,
+	[EmailTemplateSubject] [varchar](500) NULL,
+	[EmailTemplateID] [int] IDENTITY(1,1) NOT NULL,
+	[EmailTemplateSenderEmailAddress] [nvarchar](200) NULL,
+	[EmailTemplateBody] [nvarchar](max) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[EmailTemplateID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblMasterEmailTemplateKeyword]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteMasterEmailTemplateKeyword](
+	[KeywordID] [bigint] IDENTITY(1,1) NOT NULL,
+	[KeywordCode] [nvarchar](200) NOT NULL,
+	[KeywordDescription] [nvarchar](500) NOT NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL,
+ CONSTRAINT [PK_tblMasterEmailTemplateKeyword] PRIMARY KEY CLUSTERED 
+(
+	[KeywordID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblMasterHCPCCodes]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteMasterHCPCCodes](
+	[HCPCId] [bigint] IDENTITY(1,1) NOT NULL,
+	[HCPC] [nvarchar](50) NULL,
+	[SEQNUM] [nvarchar](5) NULL,
+	[RECID] [int] NULL,
+	[LONG_DESCRIPTION] [nvarchar](500) NULL,
+	[SHORT_DESCRIPTION] [nvarchar](50) NULL,
+	[PRICE1] [money] NULL,
+	[PRICE2] [money] NULL,
+	[PRICE3] [money] NULL,
+	[PRICE4] [money] NULL,
+	[MULT_PI] [nvarchar](50) NULL,
+	[CIM1] [nvarchar](50) NULL,
+	[CIM2] [nvarchar](1) NULL,
+	[CIM3] [nvarchar](1) NULL,
+	[MCM1] [nvarchar](50) NULL,
+	[MCM2] [nvarchar](50) NULL,
+	[MCM3] [nvarchar](1) NULL,
+	[STATUTE] [nvarchar](50) NULL,
+	[LABCERT1] [nvarchar](1) NULL,
+	[LABCERT2] [nvarchar](1) NULL,
+	[LABCERT3] [nvarchar](1) NULL,
+	[LABCERT4] [nvarchar](1) NULL,
+	[LABCERT5] [nvarchar](1) NULL,
+	[LABCERT6] [nvarchar](1) NULL,
+	[LABCERT7] [nvarchar](1) NULL,
+	[LABCERT8] [nvarchar](1) NULL,
+	[XREF1] [nvarchar](50) NULL,
+	[XREF2] [nvarchar](1) NULL,
+	[XREF3] [nvarchar](1) NULL,
+	[XREF4] [nvarchar](1) NULL,
+	[XREF5] [nvarchar](1) NULL,
+	[COV] [nvarchar](50) NULL,
+	[ASC_GRP] [nvarchar](50) NULL,
+	[ASC_DT] [nvarchar](50) NULL,
+	[OPPS] [nvarchar](1) NULL,
+	[OPPS_PI] [nvarchar](1) NULL,
+	[OPPS_DT] [nvarchar](1) NULL,
+	[PROCNOTE] [nvarchar](50) NULL,
+	[BETOS] [nvarchar](50) NULL,
+	[TOS1] [nvarchar](50) NULL,
+	[TOS2] [nvarchar](50) NULL,
+	[TOS3] [nvarchar](50) NULL,
+	[TOS4] [nvarchar](50) NULL,
+	[TOS5] [nvarchar](1) NULL,
+	[ANEST_BU] [nvarchar](50) NULL,
+	[ADD_DT] [bigint] NULL,
+	[ACT_EFF_DT] [bigint] NULL,
+	[TERM_DT] [nvarchar](50) NULL,
+	[ACTION_CD] [nvarchar](1) NULL,
+	[FILEDATETIME] [nvarchar](30) NULL,
+ CONSTRAINT [PK_tblMasterHCPCCodes] PRIMARY KEY CLUSTERED 
+(
+	[HCPCId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblMasterHealthCategory]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteMasterHealthCategory](
+	[HealthCategoryId] [int] IDENTITY(1,1) NOT NULL,
+	[HealthCategoryName] [nvarchar](50) NULL,
+ CONSTRAINT [PK_tblMasterHealthCategory] PRIMARY KEY CLUSTERED 
+(
+	[HealthCategoryId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblMasterModules]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteMasterModules](
+	[ModuleID] [bigint] IDENTITY(1,1) NOT NULL,
+	[ModuleGuid] [uniqueidentifier] NOT NULL,
+	[ModuleName] [nvarchar](200) NOT NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL,
+ CONSTRAINT [PK_tblMasterModules] PRIMARY KEY CLUSTERED 
+(
+	[ModuleID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblMasterNDCCodes]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteMasterNDCCodes](
+	[NDCId] [bigint] IDENTITY(1,1) NOT NULL,
+	[ProductId] [nvarchar](max) NULL,
+	[ProductNdc] [nvarchar](max) NULL,
+	[ProductTypeName] [nvarchar](200) NULL,
+	[ProprietaryName] [nvarchar](200) NULL,
+	[ProprietaryNameSuffix] [nvarchar](200) NULL,
+	[NonProprietaryName] [nvarchar](100) NULL,
+	[DosageFormName] [nvarchar](50) NULL,
+	[RouteName] [nvarchar](50) NULL,
+	[StartMarketingDate] [nvarchar](10) NULL,
+	[EndMarketingDate] [nvarchar](10) NULL,
+	[MarketingCategoryName] [varchar](50) NULL,
+	[ApplicationNumber] [nvarchar](50) NULL,
+	[LabelErName] [nvarchar](100) NULL,
+	[SubstanceName] [nvarchar](100) NULL,
+	[Active_Numerator_Strength] [nvarchar](50) NULL,
+	[Active_Ingred_Unit] [nvarchar](50) NULL,
+	[Pharm_Classes] [nvarchar](100) NULL,
+	[Deaschedule] [nvarchar](100) NULL,
+	[Ndc_Exclude_Flag] [char](1) NULL,
+	[Listing_Record_Certified_Through] [int] NULL,
+ CONSTRAINT [PK_tblMasterNDCCodes] PRIMARY KEY CLUSTERED 
+(
+	[NDCId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblMasterOrganizationType]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteMasterOrganizationType](
+	[OrganizationTypeID] [bigint] IDENTITY(1,1) NOT NULL,
+	[OrganizationTypeGuid] [uniqueidentifier] NOT NULL,
+	[OrganizationTypeName] [nvarchar](200) NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL,
+	[DomainID] [int] NULL,
+ CONSTRAINT [PK_tblMasterOrganizationType] PRIMARY KEY CLUSTERED 
+(
+	[OrganizationTypeID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblMasterRoles]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteMasterRoles](
+	[RoleID] [bigint] IDENTITY(1,1) NOT NULL,
+	[RoleGuid] [uniqueidentifier] NOT NULL,
+	[RoleName] [nvarchar](200) NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL,
+	[RoleDescription] [nvarchar](max) NULL,
+ CONSTRAINT [PK_tblMasterRoles] PRIMARY KEY CLUSTERED 
+(
+	[RoleID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblMasterState]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteMasterState](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](50) NULL,
+	[CountryID] [int] NULL,
+ CONSTRAINT [PK_tblStateMaster] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblMeshTerm]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteMeshTerm](
+	[MeshTermId] [bigint] NOT NULL,
+	[MeshTermGuid] [uniqueidentifier] NULL,
+	[MeshTermText] [varchar](1000) NULL,
+	[CSGuiD] [uniqueidentifier] NULL,
+	[OrderNo] [int] NULL,
+	[IsActive] [bit] NULL,
+	[IsPublish] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[MeshTermId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblModuleRoles]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteModuleRoles](
+	[ModuleRoleID] [bigint] IDENTITY(1,1) NOT NULL,
+	[ModuleRoleGuid] [uniqueidentifier] NOT NULL,
+	[ModuleID] [bigint] NOT NULL,
+	[RoleID] [bigint] NOT NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ModuleRoleID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblOrganization]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteOrganization](
+	[OrganizationID] [bigint] IDENTITY(1,1) NOT NULL,
+	[OrganizationGuid] [uniqueidentifier] NOT NULL,
+	[OrganizationName] [nvarchar](200) NULL,
+	[BusinessName] [nvarchar](200) NULL,
+	[SubDomainName] [nvarchar](200) NULL,
+	[LogoName] [nvarchar](200) NULL,
+	[FaviconName] [nvarchar](200) NULL,
+	[Address] [nvarchar](500) NULL,
+	[EmailAddress] [nvarchar](500) NULL,
+	[PrimaryContactNumber] [nvarchar](200) NULL,
+	[SecondaryContactNumber] [nvarchar](200) NULL,
+	[StateName] [nvarchar](200) NULL,
+	[CountryID] [int] NOT NULL,
+	[OrganizationTypesId] [bigint] NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL,
+	[CityName] [nvarchar](200) NULL,
+ CONSTRAINT [PK__tblOrgan__CADB0B727F851B95] PRIMARY KEY CLUSTERED 
+(
+	[OrganizationID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblOrganizationMapInvite]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteOrganizationMapInvite](
+	[OrganizationMapInviteId] [bigint] IDENTITY(1,1) NOT NULL,
+	[OrganizationId] [bigint] NULL,
+	[AccountInviteGuid] [uniqueidentifier] NULL,
+ CONSTRAINT [PK_tblOrganizationInvite] PRIMARY KEY CLUSTERED 
+(
+	[OrganizationMapInviteId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblOrganizationMapRole]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteOrganizationMapRole](
+	[RoleMapId] [bigint] IDENTITY(1,1) NOT NULL,
+	[UserID] [bigint] NULL,
+	[RoleID] [bigint] NULL,
+ CONSTRAINT [PK_tblOrganizationMapRole] PRIMARY KEY CLUSTERED 
+(
+	[RoleMapId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblOrganizationsToken]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteOrganizationsToken](
+	[OrganizationsTokenID] [int] NOT NULL,
+	[OrganizationsEncryptString] [nvarchar](255) NOT NULL,
+	[OrganizationsDecryptString] [nvarchar](255) NOT NULL,
+	[OrganizationsGuid] [varchar](50) NULL,
+	[TokenType] [int] NULL,
+	[TokenDescription] [varchar](500) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[OrganizationsTokenID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblParticipantHealthRecord]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteParticipantHealthRecord](
+	[ParticipantHealthRecordId] [int] IDENTITY(1,1) NOT NULL,
+	[ParticipantHealthRecordGuid] [uniqueidentifier] NOT NULL,
+	[ParticipantHealthRecordLabel] [nvarchar](300) NULL,
+	[ParticipantHealthRecordValue] [nvarchar](500) NULL,
+	[ParticipantHealthRecordAttachmentName] [nvarchar](200) NULL,
+	[ParticipantHealthRecordAttachmentSaveFileName] [nvarchar](500) NULL,
+	[ParticipantHealthRecordAttachmentOrginalFileName] [nvarchar](200) NULL,
+	[HealthCategoryId] [int] NULL,
+	[ParticipantHealthRecordStatus] [int] NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblResponsibleParty]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteResponsibleParty](
+	[CSResponsiblePartyId] [bigint] NOT NULL,
+	[CSResponsiblePartyGuID] [uniqueidentifier] NULL,
+	[CSResponsiblePartyName] [varchar](200) NULL,
+	[CSContactPhone1] [varchar](20) NULL,
+	[CSContactEmailAddress1] [varchar](50) NULL,
+	[CSContactAddress1] [varchar](200) NULL,
+	[CSContactAddress2] [varchar](200) NULL,
+	[CSGuiD] [uniqueidentifier] NULL,
+	[OrderNo] [int] NULL,
+	[IsActive] [bit] NULL,
+	[IsPublish] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[CSResponsiblePartyId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblSmtp]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteSmtp](
+	[SmtpID] [bigint] IDENTITY(1,1) NOT NULL,
+	[SmtpGuid] [uniqueidentifier] NOT NULL,
+	[ServerName] [nvarchar](200) NULL,
+	[ServerIP] [nvarchar](200) NULL,
+	[UserName] [varbinary](max) NULL,
+	[Password] [varbinary](max) NULL,
+	[OrganizationsID] [bigint] NOT NULL,
+	[IsBlocked] [bit] NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL,
+ CONSTRAINT [PK__tblSmtp__F70728F274988C32] PRIMARY KEY CLUSTERED 
+(
+	[SmtpID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblSubscription]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteSubscription](
+	[SubscriptionID] [bigint] IDENTITY(1,1) NOT NULL,
+	[subscriptionName] [nvarchar](200) NOT NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[SubscriptionID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblUIAction]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteUIAction](
+	[ActionID] [bigint] IDENTITY(1,1) NOT NULL,
+	[ActionName] [nvarchar](50) NULL,
+ CONSTRAINT [PK_tblUIAction] PRIMARY KEY CLUSTERED 
+(
+	[ActionID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblUIChildUserRoleAssign]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteUIChildUserRoleAssign](
+	[ChildUserRoleAssignID] [bigint] IDENTITY(1,1) NOT NULL,
+	[RoleID] [bigint] NULL,
+	[UserID] [bigint] NULL,
+ CONSTRAINT [PK_tblChildUserRoleAssign] PRIMARY KEY CLUSTERED 
+(
+	[ChildUserRoleAssignID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblUIRoleWiseSideMenuPermission]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteUIRoleWiseSideMenuPermission](
+	[UserPermissionID] [bigint] IDENTITY(1,1) NOT NULL,
+	[RoleID] [bigint] NULL,
+	[SideMenuActionID] [bigint] NULL,
+	[HasAccess] [bit] NULL,
+ CONSTRAINT [PK_tblUserPermission] PRIMARY KEY CLUSTERED 
+(
+	[UserPermissionID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblUISideMenu]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteUISideMenu](
+	[UISideMenuID] [bigint] IDENTITY(1,1) NOT NULL,
+	[OrganizationTypeID] [bigint] NULL,
+	[Header] [nvarchar](50) NULL,
+	[Navigationlink] [nvarchar](50) NULL,
+	[ClassStyle] [nvarchar](50) NULL,
+	[Order] [int] NULL,
+	[ParentSideMenuID] [bigint] NULL,
+ CONSTRAINT [PK_tblUISideMenu] PRIMARY KEY CLUSTERED 
+(
+	[UISideMenuID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblUISideMenuAction]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteUISideMenuAction](
+	[SideMenuActionID] [bigint] IDENTITY(1,1) NOT NULL,
+	[UISideMenuID] [bigint] NULL,
+	[ActionID] [bigint] NULL,
+ CONSTRAINT [PK_tblUINavMenuAction] PRIMARY KEY CLUSTERED 
+(
+	[SideMenuActionID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblUserDomainRoles]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteUserDomainRoles](
+	[DomainRolesID] [bigint] IDENTITY(1,1) NOT NULL,
+	[DomainID] [bigint] NOT NULL,
+	[RoleID] [bigint] NOT NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL,
+ CONSTRAINT [PK_tblUserDomainRoles] PRIMARY KEY CLUSTERED 
+(
+	[DomainRolesID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblUserProfiles]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteUserProfiles](
+	[UserProfileID] [bigint] IDENTITY(1,1) NOT NULL,
+	[UserProfileGuid] [uniqueidentifier] NOT NULL,
+	[FirstName] [varbinary](max) NULL,
+	[MiddleName] [varbinary](max) NULL,
+	[LastName] [varbinary](max) NULL,
+	[MaidenName] [varbinary](max) NULL,
+	[OtherName] [varbinary](max) NULL,
+	[UserID] [bigint] NOT NULL,
+	[GenderId] [smallint] NULL,
+	[MaritalStatusId] [int] NULL,
+	[NativeSpokenLanguage] [nvarchar](50) NULL,
+	[CreatedByLoginID] [int] NOT NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL,
+	[StateName] [nvarchar](200) NULL,
+	[CountryID] [int] NOT NULL,
+	[Age] [varbinary](max) NULL,
+	[DOB] [varbinary](max) NULL,
+	[EmailAddress] [varbinary](max) NULL,
+	[PrimaryContactNumber] [varbinary](max) NULL,
+	[SecondaryContactNumber] [varbinary](max) NULL,
+	[ProfilePicture] [nvarchar](300) NULL,
+ CONSTRAINT [PK_tblUserProfiles] PRIMARY KEY CLUSTERED 
+(
+	[UserProfileID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblUserRoles]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteUserRoles](
+	[UserRoleID] [bigint] IDENTITY(1,1) NOT NULL,
+	[UserRoleGuid] [uniqueidentifier] NOT NULL,
+	[DomainRoleID] [bigint] NOT NULL,
+	[UserID] [bigint] NOT NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[UserRoleID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblUsers]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteUsers](
+	[UserID] [bigint] IDENTITY(1,1) NOT NULL,
+	[AccountInviteGuid] [uniqueidentifier] NULL,
+	[MacAddress] [nvarchar](200) NOT NULL,
+	[TransactionCode] [nvarchar](200) NOT NULL,
+	[IsActive] [bit] NULL,
+	[IsBlocked] [bit] NULL,
+	[InvalidAttempt] [int] NULL,
+	[PasswordExpirationDate] [datetime2](7) NULL,
+	[LastLogin] [datetime2](7) NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL,
+	[UserName] [varbinary](max) NULL,
+	[UserPassword] [varbinary](max) NULL,
+	[OrganizationID] [bigint] NULL,
+	[IsStaff] [bit] NULL,
+	[ChildOrganizationID] [bigint] NULL,
+ CONSTRAINT [PK_tblUsers] PRIMARY KEY CLUSTERED 
+(
+	[UserID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblUserSignInLogging]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteUserSignInLogging](
+	[UserSignInGuid] [uniqueidentifier] NOT NULL,
+	[UserName] [varchar](50) NOT NULL,
+	[UserType] [int] NULL,
+	[UserSystemIP] [varchar](25) NOT NULL,
+	[SignInStatus] [int] NULL,
+	[UserId] [bigint] NULL,
+	[LoggingMessage] [varchar](100) NULL,
+	[CreatedDate] [datetime] NULL,
+	[CreatedBy] [bigint] NULL,
+	[UserEmailAddress] [varbinary](max) NULL
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tblVendors]    Script Date: 2/22/2022 11:47:34 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblSiteVendors](
+	[VendorID] [bigint] IDENTITY(1,1) NOT NULL,
+	[VendorGuid] [uniqueidentifier] NOT NULL,
+	[FirstName] [nvarchar](200) NULL,
+	[MiddleName] [nvarchar](200) NULL,
+	[LastName] [nvarchar](200) NULL,
+	[EmailAddress] [nvarchar](500) NULL,
+	[PrimaryContactNumber] [nvarchar](200) NULL,
+	[SecondaryContactNumber] [nvarchar](200) NULL,
+	[IsActive] [bit] NULL,
+	[IsDeleted] [bit] NULL,
+	[DeletedBy] [bigint] NULL,
+	[DeletedOn] [datetime2](7) NULL,
+	[CreatedBy] [bigint] NULL,
+	[CreatedOn] [datetime2](7) NULL,
+	[ModifiedBy] [bigint] NULL,
+	[ModifiedOn] [datetime2](7) NULL,
+	[StateID] [int] NOT NULL,
+	[CountryID] [int] NOT NULL,
+	[SubscriptionID] [bigint] NOT NULL,
+	[OrganizationID] [bigint] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[VendorID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Index [UQ__tblCSDet__13A42FB86EBBE825]    Script Date: 2/22/2022 11:49:15 AM ******/
+ALTER TABLE [dbo].[tblSiteCSDetails] ADD  CONSTRAINT [UQ__tblCSDet__13A42FB86EBBE825] UNIQUE NONCLUSTERED 
+(
+	[CSGuiD] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+/****** Object:  Index [UQ__tblUserP__9E267F4331F14E0C]    Script Date: 2/22/2022 11:49:15 AM ******/
+ALTER TABLE [dbo].[tblSiteUserProfiles] ADD  CONSTRAINT [UQ__tblUserP__9E267F4331F14E0C] UNIQUE NONCLUSTERED 
+(
+	[UserProfileID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+/****** Object:  Index [UQ__tblUsers__1788CCAD677F8737]    Script Date: 2/22/2022 11:49:15 AM ******/
+ALTER TABLE [dbo].[tblSiteUsers] ADD  CONSTRAINT [UQ__tblUsers__1788CCAD677F8737] UNIQUE NONCLUSTERED 
+(
+	[UserID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyAttachment] ADD  DEFAULT (newid()) FOR [ClinicalStudyAttachmentGuid]
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyContract] ADD  DEFAULT (newid()) FOR [ClinicalStudyContractGuid]
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyDrug] ADD  DEFAULT (newid()) FOR [ClinicalStudyDrugGuid]
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyInventory] ADD  DEFAULT (newid()) FOR [ClinicalStudyInvetoryGuid]
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyRoles] ADD  DEFAULT (newid()) FOR [ClinicalStudyRolesGuid]
+GO
+ALTER TABLE [dbo].[tblSiteCSStudyID] ADD  DEFAULT (newid()) FOR [ClinicalStudyGuid]
+GO
+ALTER TABLE [dbo].[tblSiteDatabases] ADD  DEFAULT (newid()) FOR [DatabaseGuid]
+GO
+ALTER TABLE [dbo].[tblSiteDocumentCenterFile] ADD  CONSTRAINT [DF_tblDocumentCenterFile_DocumentCenterFileVersion]  DEFAULT ((1.0)) FOR [DocumentCenterFileVersion]
+GO
+ALTER TABLE [dbo].[tblSiteInventories] ADD  DEFAULT (newid()) FOR [InventoryGuid]
+GO
+ALTER TABLE [dbo].[tblSiteLogUsers] ADD  DEFAULT (newid()) FOR [LogUserGuid]
+GO
+ALTER TABLE [dbo].[tblSiteMasterActivity] ADD  DEFAULT (newid()) FOR [ActivityGuid]
+GO
+ALTER TABLE [dbo].[tblSiteMasterAPI] ADD  DEFAULT (newid()) FOR [APIGuid]
+GO
+ALTER TABLE [dbo].[tblSiteMasterModules] ADD  DEFAULT (newid()) FOR [ModuleGuid]
+GO
+ALTER TABLE [dbo].[tblSiteMasterOrganizationType] ADD  DEFAULT (newid()) FOR [OrganizationTypeGuid]
+GO
+ALTER TABLE [dbo].[tblSiteMasterRoles] ADD  DEFAULT (newid()) FOR [RoleGuid]
+GO
+ALTER TABLE [dbo].[tblSiteModuleRoles] ADD  DEFAULT (newid()) FOR [ModuleRoleGuid]
+GO
+ALTER TABLE [dbo].[tblSiteOrganization] ADD  CONSTRAINT [DF__tblOrgani__Organ__24285DB4]  DEFAULT (newid()) FOR [OrganizationGuid]
+GO
+ALTER TABLE [dbo].[tblSiteSmtp] ADD  CONSTRAINT [DF__tblSmtp__SmtpGui__4E88ABD4]  DEFAULT (newid()) FOR [SmtpGuid]
+GO
+ALTER TABLE [dbo].[tblSiteUserProfiles] ADD  CONSTRAINT [DF__tblUserPr__UserP__4F7CD00D]  DEFAULT (newid()) FOR [UserProfileGuid]
+GO
+ALTER TABLE [dbo].[tblSiteUserRoles] ADD  DEFAULT (newid()) FOR [UserRoleGuid]
+GO
+ALTER TABLE [dbo].[tblSiteUsers] ADD  CONSTRAINT [DF__tblUsers__UserGu__27F8EE98]  DEFAULT (newid()) FOR [AccountInviteGuid]
+GO
+ALTER TABLE [dbo].[tblSiteVendors] ADD  DEFAULT (newid()) FOR [VendorGuid]
+GO
+ALTER TABLE [dbo].[tblSiteCSInterventionOrTreatment]  WITH CHECK ADD  CONSTRAINT [FK__tbCSInter__CSGui__33F4B129] FOREIGN KEY([CSGuiD])
+REFERENCES [dbo].[tblSiteCSDetails] ([CSGuiD])
+GO
+ALTER TABLE [dbo].[tblSiteCSInterventionOrTreatment] CHECK CONSTRAINT [FK__tbCSInter__CSGui__33F4B129]
+GO
+ALTER TABLE [dbo].[tblSiteCSPhase]  WITH CHECK ADD  CONSTRAINT [FK__tbCSPhase__CSGui__25A691D2] FOREIGN KEY([CSGuiD])
+REFERENCES [dbo].[tblSiteCSDetails] ([CSGuiD])
+GO
+ALTER TABLE [dbo].[tblSiteCSPhase] CHECK CONSTRAINT [FK__tbCSPhase__CSGui__25A691D2]
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyAttachment]  WITH CHECK ADD  CONSTRAINT [FK_tblClinicalStudy_tblClinicalStudyAttachment] FOREIGN KEY([ClinicalStudyID])
+REFERENCES [dbo].[tblSiteCSStudyID] ([ClinicalStudyID])
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyAttachment] CHECK CONSTRAINT [FK_tblClinicalStudy_tblClinicalStudyAttachment]
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyAttachment]  WITH CHECK ADD  CONSTRAINT [FK_tblClinicalStudyContract_tblClinicalStudyAttachment] FOREIGN KEY([ClinicalStudyContractID])
+REFERENCES [dbo].[tblSiteClinicalStudyContract] ([ClinicalStudyContractID])
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyAttachment] CHECK CONSTRAINT [FK_tblClinicalStudyContract_tblClinicalStudyAttachment]
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyContract]  WITH CHECK ADD  CONSTRAINT [FK_tblClinicalStudy_tblClinicalStudyContract] FOREIGN KEY([ClinicalStudyID])
+REFERENCES [dbo].[tblSiteCSStudyID] ([ClinicalStudyID])
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyContract] CHECK CONSTRAINT [FK_tblClinicalStudy_tblClinicalStudyContract]
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyDrug]  WITH CHECK ADD  CONSTRAINT [FK_tblClinicalStudy_tblClinicalStudyDrug] FOREIGN KEY([ClinicalStudyID])
+REFERENCES [dbo].[tblSiteCSStudyID] ([ClinicalStudyID])
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyDrug] CHECK CONSTRAINT [FK_tblClinicalStudy_tblClinicalStudyDrug]
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyInventory]  WITH CHECK ADD  CONSTRAINT [FK_tblClinicalStudy_tblClinicalStudyInvetory] FOREIGN KEY([ClinicalStudyID])
+REFERENCES [dbo].[tblSiteCSStudyID] ([ClinicalStudyID])
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyInventory] CHECK CONSTRAINT [FK_tblClinicalStudy_tblClinicalStudyInvetory]
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyRoles]  WITH CHECK ADD  CONSTRAINT [FK_tblClinicalStudy_tblClinicalStudyRoles] FOREIGN KEY([ClinicalStudyID])
+REFERENCES [dbo].[tblSiteCSStudyID] ([ClinicalStudyID])
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyRoles] CHECK CONSTRAINT [FK_tblClinicalStudy_tblClinicalStudyRoles]
+GO
+ALTER TABLE [dbo].[tblSiteCSArmsInterventions]  WITH CHECK ADD  CONSTRAINT [FK__tblCSArms__CSGui__04459E07] FOREIGN KEY([CSGuiD])
+REFERENCES [dbo].[tblSiteCSDetails] ([CSGuiD])
+GO
+ALTER TABLE [dbo].[tblSiteCSArmsInterventions] CHECK CONSTRAINT [FK__tblCSArms__CSGui__04459E07]
+GO
+ALTER TABLE [dbo].[tblSiteCSConditionOrDisease]  WITH CHECK ADD  CONSTRAINT [FK__tblCSCond__CSGui__3118447E] FOREIGN KEY([CSGuiD])
+REFERENCES [dbo].[tblSiteCSDetails] ([CSGuiD])
+GO
+ALTER TABLE [dbo].[tblSiteCSConditionOrDisease] CHECK CONSTRAINT [FK__tblCSCond__CSGui__3118447E]
+GO
+ALTER TABLE [dbo].[tblSiteCSCriteria]  WITH CHECK ADD  CONSTRAINT [FK__tblCSCrit__CSGui__07220AB2] FOREIGN KEY([CSGuiD])
+REFERENCES [dbo].[tblSiteCSDetails] ([CSGuiD])
+GO
+ALTER TABLE [dbo].[tblSiteCSCriteria] CHECK CONSTRAINT [FK__tblCSCrit__CSGui__07220AB2]
+GO
+ALTER TABLE [dbo].[tblSiteCSInventory]  WITH CHECK ADD  CONSTRAINT [FK_tblCSDetails_tblCSInventory] FOREIGN KEY([CSGuiD])
+REFERENCES [dbo].[tblSiteCSDetails] ([CSGuiD])
+GO
+ALTER TABLE [dbo].[tblSiteCSInventory] CHECK CONSTRAINT [FK_tblCSDetails_tblCSInventory]
+GO
+ALTER TABLE [dbo].[tblSiteCSLocation]  WITH CHECK ADD  CONSTRAINT [FK__tblCSLoca__CSGui__1387E197] FOREIGN KEY([CSGuiD])
+REFERENCES [dbo].[tblSiteCSDetails] ([CSGuiD])
+GO
+ALTER TABLE [dbo].[tblSiteCSLocation] CHECK CONSTRAINT [FK__tblCSLoca__CSGui__1387E197]
+GO
+ALTER TABLE [dbo].[tblSiteCSOutcomeMeasures]  WITH CHECK ADD  CONSTRAINT [FK__tblCSOutc__CSGui__0169315C] FOREIGN KEY([CSGuiD])
+REFERENCES [dbo].[tblSiteCSDetails] ([CSGuiD])
+GO
+ALTER TABLE [dbo].[tblSiteCSOutcomeMeasures] CHECK CONSTRAINT [FK__tblCSOutc__CSGui__0169315C]
+GO
+ALTER TABLE [dbo].[tblSiteCSResourceLink]  WITH CHECK ADD  CONSTRAINT [FK__tblCSReso__CSGui__7BB05806] FOREIGN KEY([CSGuiD])
+REFERENCES [dbo].[tblSiteCSDetails] ([CSGuiD])
+GO
+ALTER TABLE [dbo].[tblSiteCSResourceLink] CHECK CONSTRAINT [FK__tblCSReso__CSGui__7BB05806]
+GO
+ALTER TABLE [dbo].[tblSiteCSSearchKeyword]  WITH CHECK ADD  CONSTRAINT [FK__tblCSSear__CSGui__2B5F6B28] FOREIGN KEY([CSGuiD])
+REFERENCES [dbo].[tblCSDetails] ([CSGuiD])
+GO
+ALTER TABLE [dbo].[tblSiteCSSearchKeyword] CHECK CONSTRAINT [FK__tblCSSear__CSGui__2B5F6B28]
+GO
+ALTER TABLE [dbo].[tblSiteCSStudySponsorCROInvite]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteCSStudySponsorCROInvite_tblSiteCSDetails] FOREIGN KEY([CSStudyStudyID])
+REFERENCES [dbo].[tblSiteCSDetails] ([CSStudyID])
+GO
+ALTER TABLE [dbo].[tblSiteCSStudySponsorCROInvite] CHECK CONSTRAINT [FK_tblSiteCSStudySponsorCROInvite_tblSiteCSDetails]
+GO
+ALTER TABLE [dbo].[tblSiteCSStudySponsorCROInvite]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteCSStudySponsorCROInvite_tblSiteUsers] FOREIGN KEY([SponsorID])
+REFERENCES [dbo].[tblSiteUsers] ([UserID])
+GO
+ALTER TABLE [dbo].[tblSiteCSStudySponsorCROInvite] CHECK CONSTRAINT [FK_tblSiteCSStudySponsorCROInvite_tblSiteUsers]
+GO
+ALTER TABLE [dbo].[tblSiteCSStudySponsorCROInvite]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteCSStudySponsorCROInvite_tblSiteUsers1] FOREIGN KEY([CROID])
+REFERENCES [dbo].[tblSiteUsers] ([UserID])
+GO
+ALTER TABLE [dbo].[tblSiteCSStudySponsorCROInvite] CHECK CONSTRAINT [FK_tblSiteCSStudySponsorCROInvite_tblSiteUsers1]
+GO
+ALTER TABLE [dbo].[tblSiteCSStudySponsorCROMsg]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteCSStudySponsorCROMsg_tblSiteCSStudySponsorCROInvite] FOREIGN KEY([StudySponsorCROInviteID])
+REFERENCES [dbo].[tblSiteCSStudySponsorCROInvite] ([CSStudySponsorCROInviteID])
+GO
+ALTER TABLE [dbo].[tblSiteCSStudySponsorCROMsg] CHECK CONSTRAINT [FK_tblSiteCSStudySponsorCROMsg_tblSiteCSStudySponsorCROInvite]
+GO
+ALTER TABLE [dbo].[tblSiteCSStudySponsorCROMsgAttachment]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteCSStudySponsorCROMsgAttachment_tblSiteCSStudySponsorCROMsg] FOREIGN KEY([CSStudySponsorCROInviteID])
+REFERENCES [dbo].[tblSiteCSStudySponsorCROInvite] ([CSStudySponsorCROInviteID])
+GO
+ALTER TABLE [dbo].[tblSiteCSStudySponsorCROMsgAttachment] CHECK CONSTRAINT [FK_tblSiteCSStudySponsorCROMsgAttachment_tblSiteCSStudySponsorCROMsg]
+GO
+ALTER TABLE [dbo].[tblSiteDatabases]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteOrganizations_tblSiteDatbases] FOREIGN KEY([OrganizationsID])
+REFERENCES [dbo].[tblSiteOrganization] ([OrganizationID])
+GO
+ALTER TABLE [dbo].[tblSiteDatabases] CHECK CONSTRAINT [FK_tblSiteOrganizations_tblSiteDatbases]
+GO
+ALTER TABLE [dbo].[tblSiteDocumentCenterFile]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteDocumentCenterFile_tblSiteDocumentCenter] FOREIGN KEY([DocumentCenterId])
+REFERENCES [dbo].[tblSiteDocumentCenter] ([DocumentCenterId])
+GO
+ALTER TABLE [dbo].[tblSiteDocumentCenterFile] CHECK CONSTRAINT [FK_tblSiteDocumentCenterFile_tblSiteDocumentCenter]
+GO
+ALTER TABLE [dbo].[tblSiteInventories]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteOrganization_tblSiteInventories] FOREIGN KEY([OrganizationID])
+REFERENCES [dbo].[tblSiteOrganization] ([OrganizationID])
+GO
+ALTER TABLE [dbo].[tblSiteInventories] CHECK CONSTRAINT [FK_tblSiteOrganization_tblSiteInventories]
+GO
+ALTER TABLE [dbo].[tblSiteMasterAPI]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteMasterModules_tblSiteMasterAPI] FOREIGN KEY([ModuleID])
+REFERENCES [dbo].[tblSiteMasterModules] ([ModuleID])
+GO
+ALTER TABLE [dbo].[tblMasterAPI] CHECK CONSTRAINT [FK_tblSiteSiteMasterModules_tblSiteMasterAPI]
+GO
+ALTER TABLE [dbo].[tblSiteMasterCity]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteMasterCity_tblSiteMasterState] FOREIGN KEY([StateID])
+REFERENCES [dbo].[tblSiteMasterState] ([ID])
+GO
+ALTER TABLE [dbo].[tblSiteMasterCity] CHECK CONSTRAINT [FK_tblSiteMasterCity_tblSiteMasterState]
+GO
+ALTER TABLE [dbo].[tblSiteMasterState]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteStateMaster_tblSiteCountryMaster] FOREIGN KEY([CountryID])
+REFERENCES [dbo].[tblSiteMasterCountry] ([ID])
+GO
+ALTER TABLE [dbo].[tblSiteMasterState] CHECK CONSTRAINT [FK_tblSiteStateMaster_tblSiteCountryMaster]
+GO
+ALTER TABLE [dbo].[tblSiteMeshTerm]  WITH CHECK ADD  CONSTRAINT [FK__tblSiteMeshTe__CSGui__1D114BD1] FOREIGN KEY([CSGuiD])
+REFERENCES [dbo].[tblSiteCSDetails] ([CSGuiD])
+GO
+ALTER TABLE [dbo].[tblSiteMeshTerm] CHECK CONSTRAINT [FK__tblSiteMeshTe__CSGui__1D114BD1]
+GO
+ALTER TABLE [dbo].[tblSiteModuleRoles]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteMasterModules_tblSiteModuleRoles] FOREIGN KEY([ModuleID])
+REFERENCES [dbo].[tblSiteMasterModules] ([ModuleID])
+GO
+ALTER TABLE [dbo].[tblSiteModuleRoles] CHECK CONSTRAINT [FK_tblSiteMasterModules_tblSiteModuleRoles]
+GO
+ALTER TABLE [dbo].[tblSiteModuleRoles]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteMasterRoles_tblSiteModuleRoles] FOREIGN KEY([RoleID])
+REFERENCES [dbo].[tblSiteMasterRoles] ([RoleID])
+GO
+ALTER TABLE [dbo].[tblSiteModuleRoles] CHECK CONSTRAINT [FK_tblSiteMasterRoles_tblSiteModuleRoles]
+GO
+ALTER TABLE [dbo].[tblSiteOrganization]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteCountryMaster_tblSiteOrganizations] FOREIGN KEY([CountryID])
+REFERENCES [dbo].[tblSiteMasterCountry] ([ID])
+GO
+ALTER TABLE [dbo].[tblSiteOrganization] CHECK CONSTRAINT [FK_tblSiteCountryMaster_tblSiteOrganizations]
+GO
+ALTER TABLE [dbo].[tblSiteOrganization]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteOrganization_tblSiteMasterOrganizationType] FOREIGN KEY([OrganizationTypesId])
+REFERENCES [dbo].[tblSiteMasterOrganizationType] ([OrganizationTypeID])
+GO
+ALTER TABLE [dbo].[tblSiteOrganization] CHECK CONSTRAINT [FK_tblSiteOrganization_tblSiteMasterOrganizationType]
+GO
+ALTER TABLE [dbo].[tblSiteOrganization]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteOrganization_tblSiteOrganization] FOREIGN KEY([OrganizationID])
+REFERENCES [dbo].[tblSiteOrganization] ([OrganizationID])
+GO
+ALTER TABLE [dbo].[tblSiteOrganization] CHECK CONSTRAINT [FK_tblSiteOrganization_tblSiteOrganization]
+GO
+ALTER TABLE [dbo].[tblSiteOrganizationMapInvite]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteOrganizationInvite_tblSiteOrganization] FOREIGN KEY([OrganizationId])
+REFERENCES [dbo].[tblSiteOrganization] ([OrganizationID])
+GO
+ALTER TABLE [dbo].[tblSiteOrganizationMapInvite] CHECK CONSTRAINT [FK_tblSiteOrganizationInvite_tblSiteOrganization]
+GO
+ALTER TABLE [dbo].[tblSiteOrganizationMapRole]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteOrganizationMapRole_tblSiteMasterRoles] FOREIGN KEY([RoleID])
+REFERENCES [dbo].[tblSiteMasterRoles] ([RoleID])
+GO
+ALTER TABLE [dbo].[tblSiteOrganizationMapRole] CHECK CONSTRAINT [FK_tblSiteOrganizationMapRole_tblSiteMasterRoles]
+GO
+ALTER TABLE [dbo].[tblSiteOrganizationMapRole]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteUsers_tblSiteOrganizationMapRole] FOREIGN KEY([UserID])
+REFERENCES [dbo].[tblSiteUsers] ([UserID])
+GO
+ALTER TABLE [dbo].[tblSiteOrganizationMapRole] CHECK CONSTRAINT [FK_tblUsers_tblOrganizationMapRole]
+GO
+ALTER TABLE [dbo].[tblSiteParticipantHealthRecord]  WITH CHECK ADD FOREIGN KEY([HealthCategoryId])
+REFERENCES [dbo].[tblSiteMasterHealthCategory] ([HealthCategoryId])
+GO
+ALTER TABLE [dbo].[tblSiteResponsibleParty]  WITH CHECK ADD  CONSTRAINT [FK__tblRespon__CSGui__2882FE7D] FOREIGN KEY([CSGuiD])
+REFERENCES [dbo].[tblSiteCSDetails] ([CSGuiD])
+GO
+ALTER TABLE [dbo].[tblSiteResponsibleParty] CHECK CONSTRAINT [FK__tblRespon__CSGui__2882FE7D]
+GO
+ALTER TABLE [dbo].[tblSiteSmtp]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteOrganizations_tblSiteSmtp] FOREIGN KEY([OrganizationsID])
+REFERENCES [dbo].[tblSiteOrganization] ([OrganizationID])
+GO
+ALTER TABLE [dbo].[tblSiteSmtp] CHECK CONSTRAINT [FK_tblOrganizations_tblSmtp]
+GO
+ALTER TABLE [dbo].[tblSiteUIChildUserRoleAssign]  WITH CHECK ADD  CONSTRAINT [FK_tblUIChildUserRoleAssign_tblSiteMasterRoles] FOREIGN KEY([RoleID])
+REFERENCES [dbo].[tblSiteMasterRoles] ([RoleID])
+GO
+ALTER TABLE [dbo].[tblSiteUIChildUserRoleAssign] CHECK CONSTRAINT [FK_tblSiteUIChildUserRoleAssign_tblSiteMasterRoles]
+GO
+ALTER TABLE [dbo].[tblSiteUIChildUserRoleAssign]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteUIChildUserRoleAssign_tblSiteUsers] FOREIGN KEY([UserID])
+REFERENCES [dbo].[tblSiteUsers] ([UserID])
+GO
+ALTER TABLE [dbo].[tblSiteUIChildUserRoleAssign] CHECK CONSTRAINT [FK_tblSiteUIChildUserRoleAssign_tblSiteUsers]
+GO
+ALTER TABLE [dbo].[tblSiteUIRoleWiseSideMenuPermission]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteUIRoleWiseSideMenuPermission_tblSiteMasterRoles] FOREIGN KEY([RoleID])
+REFERENCES [dbo].[tblSiteMasterRoles] ([RoleID])
+GO
+ALTER TABLE [dbo].[tblSiteUIRoleWiseSideMenuPermission] CHECK CONSTRAINT [FK_tblSiteUIRoleWiseSideMenuPermission_tblSiteMasterRoles]
+GO
+ALTER TABLE [dbo].[tblSiteUIRoleWiseSideMenuPermission]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteUIRoleWiseSideMenuPermission_tblSiteUISideMenuAction] FOREIGN KEY([SideMenuActionID])
+REFERENCES [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID])
+GO
+ALTER TABLE [dbo].[tblSiteUIRoleWiseSideMenuPermission] CHECK CONSTRAINT [FK_tblSiteUIRoleWiseSideMenuPermission_tblSiteUISideMenuAction]
+GO
+ALTER TABLE [dbo].[tblSiteUISideMenu]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteUISideMenu_tblSiteMasterOrganizationType] FOREIGN KEY([OrganizationTypeID])
+REFERENCES [dbo].[tblSiteMasterOrganizationType] ([OrganizationTypeID])
+GO
+ALTER TABLE [dbo].[tblSiteUISideMenu] CHECK CONSTRAINT [FK_tblSiteUISideMenu_tblSiteMasterOrganizationType]
+GO
+ALTER TABLE [dbo].[tblSiteUISideMenu]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteUISideMenu_tblSiteUISideMenu] FOREIGN KEY([ParentSideMenuID])
+REFERENCES [dbo].[tblSiteUISideMenu] ([UISiteSideMenuID])
+GO
+ALTER TABLE [dbo].[tblSiteUISideMenu] CHECK CONSTRAINT [FK_tblSiteUISideMenu_tblSiteUISideMenu]
+GO
+ALTER TABLE [dbo].[tblSiteUISideMenuAction]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteUINavMenuAction_tblSiteUIAction] FOREIGN KEY([ActionID])
+REFERENCES [dbo].[tblSiteUIAction] ([ActionID])
+GO
+ALTER TABLE [dbo].[tblSiteUISideMenuAction] CHECK CONSTRAINT [FK_tblSiteUINavMenuAction_tblSiteUIAction]
+GO
+ALTER TABLE [dbo].[tblSiteUserDomainRoles]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteMasterRoles_tblSiteUserDomainRoles] FOREIGN KEY([RoleID])
+REFERENCES [dbo].[tblSiteMasterRoles] ([RoleID])
+GO
+ALTER TABLE [dbo].[tblSiteUserDomainRoles] CHECK CONSTRAINT [FK_tblSiteMasterRoles_tblSiteUserDomainRoles]
+GO
+ALTER TABLE [dbo].[tblSiteUserProfiles]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteCountryMaster_tblSiteUserProfiles] FOREIGN KEY([CountryID])
+REFERENCES [dbo].[tblSiteMasterCountry] ([ID])
+GO
+ALTER TABLE [dbo].[tblSiteUserProfiles] CHECK CONSTRAINT [FK_tblSiteCountryMaster_tblSiteUserProfiles]
+GO
+ALTER TABLE [dbo].[tblSiteUserRoles]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteMasterRoles_tblSiteUserRoles] FOREIGN KEY([DomainRoleID])
+REFERENCES [dbo].[tblSiteMasterRoles] ([RoleID])
+GO
+ALTER TABLE [dbo].[tblSiteUserRoles] CHECK CONSTRAINT [FK_tblSiteMasterRoles_tblSiteUserRoles]
+GO
+ALTER TABLE [dbo].[tblSiteUsers]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteUsers_tblSiteAccountInvites] FOREIGN KEY([AccountInviteGuid])
+REFERENCES [dbo].[tblSiteAccountInvites] ([AccountInviteGuid])
+GO
+ALTER TABLE [dbo].[tblSiteUsers] CHECK CONSTRAINT [FK_tblSiteUsers_tblSiteAccountInvites]
+GO
+ALTER TABLE [dbo].[tblSiteVendors]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteOrganization_tblSiteVendors] FOREIGN KEY([OrganizationID])
+REFERENCES [dbo].[tblSiteOrganization] ([OrganizationID])
+GO
+ALTER TABLE [dbo].[tblSiteVendors] CHECK CONSTRAINT [FK_tblSiteOrganization_tblSiteVendors]
+GO
+ALTER TABLE [dbo].[tblSiteVendors]  WITH CHECK ADD  CONSTRAINT [FK_tblSiteSubscription_tblSiteVendors] FOREIGN KEY([SubscriptionID])
+REFERENCES [dbo].[tblSiteSubscription] ([SubscriptionID])
+GO
+ALTER TABLE [dbo].[tblSiteVendors] CHECK CONSTRAINT [FK_tblSiteSubscription_tblVendors]
+GO

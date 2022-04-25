@@ -1,0 +1,321 @@
+
+/****** Object:  Index [UQ__tblCSDet__13A42FB86EBBE825]    Script Date: 2/22/2022 11:49:15 AM ******/
+ALTER TABLE [dbo].[tblSiteCSDetails] ADD  CONSTRAINT [UQ__tblCSDet__13A42FB86EBBE825] UNIQUE NONCLUSTERED 
+(
+	[CSGuiD] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+/****** Object:  Index [UQ__tblUserP__9E267F4331F14E0C]    Script Date: 2/22/2022 11:49:15 AM ******/
+ALTER TABLE [dbo].[tblSiteUserProfiles] ADD  CONSTRAINT [UQ__tblUserP__9E267F4331F14E0C] UNIQUE NONCLUSTERED 
+(
+	[UserProfileID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+/****** Object:  Index [UQ__tblUsers__1788CCAD677F8737]    Script Date: 2/22/2022 11:49:15 AM ******/
+ALTER TABLE [dbo].[tblSiteUsers] ADD  CONSTRAINT [UQ__tblUsers__1788CCAD677F8737] UNIQUE NONCLUSTERED 
+(
+	[UserID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF,  IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyAttachment] ADD  DEFAULT (newid()) FOR [ClinicalStudyAttachmentGuid]
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyContract] ADD  DEFAULT (newid()) FOR [ClinicalStudyContractGuid]
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyDrug] ADD  DEFAULT (newid()) FOR [ClinicalStudyDrugGuid]
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyInventory] ADD  DEFAULT (newid()) FOR [ClinicalStudyInvetoryGuid]
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyRoles] ADD  DEFAULT (newid()) FOR [ClinicalStudyRolesGuid]
+GO
+ALTER TABLE [dbo].[tblSiteCSStudyID] ADD  DEFAULT (newid()) FOR [ClinicalStudyGuid]
+GO
+ALTER TABLE [dbo].[tblSiteDatabases] ADD  DEFAULT (newid()) FOR [DatabaseGuid]
+GO
+ALTER TABLE [dbo].[tblSiteDocumentCenterFile] ADD  CONSTRAINT [DF_tblDocumentCenterFile_DocumentCenterFileVersion]  DEFAULT ((1.0)) FOR [DocumentCenterFileVersion]
+GO
+ALTER TABLE [dbo].[tblSiteInventories] ADD  DEFAULT (newid()) FOR [InventoryGuid]
+GO
+ALTER TABLE [dbo].[tblSiteLogUsers] ADD  DEFAULT (newid()) FOR [LogUserGuid]
+GO
+ALTER TABLE [dbo].[tblSiteMasterActivity] ADD  DEFAULT (newid()) FOR [ActivityGuid]
+GO
+ALTER TABLE [dbo].[tblSiteMasterAPI] ADD  DEFAULT (newid()) FOR [APIGuid]
+GO
+ALTER TABLE [dbo].[tblSiteMasterModules] ADD  DEFAULT (newid()) FOR [ModuleGuid]
+GO
+ALTER TABLE [dbo].[tblSiteMasterOrganizationType] ADD  DEFAULT (newid()) FOR [OrganizationTypeGuid]
+GO
+ALTER TABLE [dbo].[tblSiteMasterRoles] ADD  DEFAULT (newid()) FOR [RoleGuid]
+GO
+ALTER TABLE [dbo].[tblSiteModuleRoles] ADD  DEFAULT (newid()) FOR [ModuleRoleGuid]
+GO
+ALTER TABLE [dbo].[tblSiteOrganization] ADD  CONSTRAINT [DF__tblOrgani__Organ__24285DB4]  DEFAULT (newid()) FOR [OrganizationGuid]
+GO
+ALTER TABLE [dbo].[tblSiteSmtp] ADD  CONSTRAINT [DF__tblSmtp__SmtpGui__4E88ABD4]  DEFAULT (newid()) FOR [SmtpGuid]
+GO
+ALTER TABLE [dbo].[tblSiteUserProfiles] ADD  CONSTRAINT [DF__tblUserPr__UserP__4F7CD00D]  DEFAULT (newid()) FOR [UserProfileGuid]
+GO
+ALTER TABLE [dbo].[tblSiteUserRoles] ADD  DEFAULT (newid()) FOR [UserRoleGuid]
+GO
+ALTER TABLE [dbo].[tblSiteUsers] ADD  CONSTRAINT [DF__tblUsers__UserGu__27F8EE98]  DEFAULT (newid()) FOR [AccountInviteGuid]
+GO
+ALTER TABLE [dbo].[tblSiteVendors] ADD  DEFAULT (newid()) FOR [VendorGuid]
+GO
+ALTER TABLE [dbo].[tblSiteCSInterventionOrTreatment]  WITH CHECK ADD  CONSTRAINT [FK__tbCSInter__CSGui__33F4B129] FOREIGN KEY([CSGuiD])
+REFERENCES [dbo].[tblSiteCSDetails] ([CSGuiD])
+GO
+ALTER TABLE [dbo].[tblSiteCSInterventionOrTreatment] CHECK CONSTRAINT [FK__tbCSInter__CSGui__33F4B129]
+GO
+ALTER TABLE [dbo].[tblSiteCSPhase]  WITH CHECK ADD  CONSTRAINT [FK__tbCSPhase__CSGui__25A691D2] FOREIGN KEY([CSGuiD])
+REFERENCES [dbo].[tblSiteCSDetails] ([CSGuiD])
+GO
+ALTER TABLE [dbo].[tblSiteCSPhase] CHECK CONSTRAINT [FK__tbCSPhase__CSGui__25A691D2]
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyAttachment]  WITH CHECK ADD  CONSTRAINT [FK_tblClinicalStudy_tblClinicalStudyAttachment] FOREIGN KEY([ClinicalStudyID])
+REFERENCES [dbo].[tblSiteCSStudyID] ([ClinicalStudyID])
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyAttachment] CHECK CONSTRAINT [FK_tblClinicalStudy_tblClinicalStudyAttachment]
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyAttachment]  WITH CHECK ADD  CONSTRAINT [FK_tblClinicalStudyContract_tblClinicalStudyAttachment] FOREIGN KEY([ClinicalStudyContractID])
+REFERENCES [dbo].[tblSiteClinicalStudyContract] ([ClinicalStudyContractID])
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyAttachment] CHECK CONSTRAINT [FK_tblClinicalStudyContract_tblClinicalStudyAttachment]
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyContract]  WITH CHECK ADD  CONSTRAINT [FK_tblClinicalStudy_tblClinicalStudyContract] FOREIGN KEY([ClinicalStudyID])
+REFERENCES [dbo].[tblSiteCSStudyID] ([ClinicalStudyID])
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyContract] CHECK CONSTRAINT [FK_tblClinicalStudy_tblClinicalStudyContract]
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyDrug]  WITH CHECK ADD  CONSTRAINT [FK_tblClinicalStudy_tblClinicalStudyDrug] FOREIGN KEY([ClinicalStudyID])
+REFERENCES [dbo].[tblSiteCSStudyID] ([ClinicalStudyID])
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyDrug] CHECK CONSTRAINT [FK_tblClinicalStudy_tblClinicalStudyDrug]
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyInventory]  WITH CHECK ADD  CONSTRAINT [FK_tblClinicalStudy_tblClinicalStudyInvetory] FOREIGN KEY([ClinicalStudyID])
+REFERENCES [dbo].[tblSiteCSStudyID] ([ClinicalStudyID])
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyInventory] CHECK CONSTRAINT [FK_tblClinicalStudy_tblClinicalStudyInvetory]
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyRoles]  WITH CHECK ADD  CONSTRAINT [FK_tblClinicalStudy_tblClinicalStudyRoles] FOREIGN KEY([ClinicalStudyID])
+REFERENCES [dbo].[tblSiteCSStudyID] ([ClinicalStudyID])
+GO
+ALTER TABLE [dbo].[tblSiteClinicalStudyRoles] CHECK CONSTRAINT [FK_tblClinicalStudy_tblClinicalStudyRoles]
+GO
+ALTER TABLE [dbo].[tblSiteCSArmsInterventions]  WITH CHECK ADD  CONSTRAINT [FK__tblCSArms__CSGui__04459E07] FOREIGN KEY([CSGuiD])
+REFERENCES [dbo].[tblSiteCSDetails] ([CSGuiD])
+GO
+ALTER TABLE [dbo].[tblSiteCSArmsInterventions] CHECK CONSTRAINT [FK__tblCSArms__CSGui__04459E07]
+GO
+ALTER TABLE [dbo].[tblSiteCSConditionOrDisease]  WITH CHECK ADD  CONSTRAINT [FK__tblCSCond__CSGui__3118447E] FOREIGN KEY([CSGuiD])
+REFERENCES [dbo].[tblSiteCSDetails] ([CSGuiD])
+GO
+ALTER TABLE [dbo].[tblSiteCSConditionOrDisease] CHECK CONSTRAINT [FK__tblCSCond__CSGui__3118447E]
+GO
+ALTER TABLE [dbo].[tblSiteCSCriteria]  WITH CHECK ADD  CONSTRAINT [FK__tblCSCrit__CSGui__07220AB2] FOREIGN KEY([CSGuiD])
+REFERENCES [dbo].[tblSiteCSDetails] ([CSGuiD])
+GO
+ALTER TABLE [dbo].[tblSiteCSCriteria] CHECK CONSTRAINT [FK__tblCSCrit__CSGui__07220AB2]
+GO
+ALTER TABLE [dbo].[tblSiteCSInventory]  WITH CHECK ADD  CONSTRAINT [FK_tblCSDetails_tblCSInventory] FOREIGN KEY([CSGuiD])
+REFERENCES [dbo].[tblSiteCSDetails] ([CSGuiD])
+GO
+ALTER TABLE [dbo].[tblSiteCSInventory] CHECK CONSTRAINT [FK_tblCSDetails_tblCSInventory]
+GO
+ALTER TABLE [dbo].[tblSiteCSLocation]  WITH CHECK ADD  CONSTRAINT [FK__tblCSLoca__CSGui__1387E197] FOREIGN KEY([CSGuiD])
+REFERENCES [dbo].[tblSiteCSDetails] ([CSGuiD])
+GO
+ALTER TABLE [dbo].[tblSiteCSLocation] CHECK CONSTRAINT [FK__tblCSLoca__CSGui__1387E197]
+GO
+ALTER TABLE [dbo].[tblSiteCSOutcomeMeasures]  WITH CHECK ADD  CONSTRAINT [FK__tblCSOutc__CSGui__0169315C] FOREIGN KEY([CSGuiD])
+REFERENCES [dbo].[tblSiteCSDetails] ([CSGuiD])
+GO
+ALTER TABLE [dbo].[tblSiteCSOutcomeMeasures] CHECK CONSTRAINT [FK__tblCSOutc__CSGui__0169315C]
+GO
+ALTER TABLE [dbo].[tblSiteCSResourceLink]  WITH CHECK ADD  CONSTRAINT [FK__tblCSReso__CSGui__7BB05806] FOREIGN KEY([CSGuiD])
+REFERENCES [dbo].[tblSiteCSDetails] ([CSGuiD])
+GO
+ALTER TABLE [dbo].[tblSiteCSResourceLink] CHECK CONSTRAINT [FK__tblCSReso__CSGui__7BB05806]
+GO
+ALTER TABLE [dbo].[tblSiteCSSearchKeyword]  WITH CHECK ADD  CONSTRAINT [FK__tblCSSear__CSGui__2B5F6B28] FOREIGN KEY([CSGuiD])
+REFERENCES [dbo].[tblSiteCSDetails] ([CSGuiD])
+GO
+ALTER TABLE [dbo].[tblSiteCSSearchKeyword] CHECK CONSTRAINT [FK__tblCSSear__CSGui__2B5F6B28]
+GO
+ALTER TABLE [dbo].[tblSiteCSStudySponsorCROInvite]  WITH CHECK ADD  CONSTRAINT [FK_tblCSStudySponsorCROInvite_tblCSDetails] FOREIGN KEY([CSStudyStudyID])
+REFERENCES [dbo].[tblSiteCSDetails] ([CSStudyID])
+GO
+ALTER TABLE [dbo].[tblSiteCSStudySponsorCROInvite] CHECK CONSTRAINT [FK_tblCSStudySponsorCROInvite_tblCSDetails]
+GO
+ALTER TABLE [dbo].[tblSiteCSStudySponsorCROInvite]  WITH CHECK ADD  CONSTRAINT [FK_tblCSStudySponsorCROInvite_tblUsers] FOREIGN KEY([SponsorID])
+REFERENCES [dbo].[tblSiteUsers] ([UserID])
+GO
+ALTER TABLE [dbo].[tblSiteCSStudySponsorCROInvite] CHECK CONSTRAINT [FK_tblCSStudySponsorCROInvite_tblUsers]
+GO
+ALTER TABLE [dbo].[tblSiteCSStudySponsorCROInvite]  WITH CHECK ADD  CONSTRAINT [FK_tblCSStudySponsorCROInvite_tblUsers1] FOREIGN KEY([CROID])
+REFERENCES [dbo].[tblSiteUsers] ([UserID])
+GO
+ALTER TABLE [dbo].[tblSiteCSStudySponsorCROInvite] CHECK CONSTRAINT [FK_tblCSStudySponsorCROInvite_tblUsers1]
+GO
+ALTER TABLE [dbo].[tblSiteCSStudySponsorCROMsg]  WITH CHECK ADD  CONSTRAINT [FK_tblCSStudySponsorCROMsg_tblCSStudySponsorCROInvite] FOREIGN KEY([StudySponsorCROInviteID])
+REFERENCES [dbo].[tblSiteCSStudySponsorCROInvite] ([CSStudySponsorCROInviteID])
+GO
+ALTER TABLE [dbo].[tblSiteCSStudySponsorCROMsg] CHECK CONSTRAINT [FK_tblCSStudySponsorCROMsg_tblCSStudySponsorCROInvite]
+GO
+ALTER TABLE [dbo].[tblSiteCSStudySponsorCROMsgAttachment]  WITH CHECK ADD  CONSTRAINT [FK_tblCSStudySponsorCROMsgAttachment_tblCSStudySponsorCROMsg] FOREIGN KEY([CSStudySponsorCROInviteID])
+REFERENCES [dbo].[tblSiteCSStudySponsorCROInvite] ([CSStudySponsorCROInviteID])
+GO
+ALTER TABLE [dbo].[tblSiteCSStudySponsorCROMsgAttachment] CHECK CONSTRAINT [FK_tblCSStudySponsorCROMsgAttachment_tblCSStudySponsorCROMsg]
+GO
+ALTER TABLE [dbo].[tblSiteDatabases]  WITH CHECK ADD  CONSTRAINT [FK_tblOrganizations_tblDatbases] FOREIGN KEY([OrganizationsID])
+REFERENCES [dbo].[tblSiteOrganization] ([OrganizationID])
+GO
+ALTER TABLE [dbo].[tblSiteDatabases] CHECK CONSTRAINT [FK_tblOrganizations_tblDatbases]
+GO
+ALTER TABLE [dbo].[tblSiteDocumentCenterFile]  WITH CHECK ADD  CONSTRAINT [FK_tblDocumentCenterFile_tblDocumentCenter] FOREIGN KEY([DocumentCenterId])
+REFERENCES [dbo].[tblSiteDocumentCenter] ([DocumentCenterId])
+GO
+ALTER TABLE [dbo].[tblSiteDocumentCenterFile] CHECK CONSTRAINT [FK_tblDocumentCenterFile_tblDocumentCenter]
+GO
+ALTER TABLE [dbo].[tblSiteInventories]  WITH CHECK ADD  CONSTRAINT [FK_tblOrganization_tblInventories] FOREIGN KEY([OrganizationID])
+REFERENCES [dbo].[tblSiteOrganization] ([OrganizationID])
+GO
+ALTER TABLE [dbo].[tblSiteInventories] CHECK CONSTRAINT [FK_tblOrganization_tblInventories]
+GO
+ALTER TABLE [dbo].[tblSiteMasterAPI]  WITH CHECK ADD  CONSTRAINT [FK_tblMasterModules_tblMasterAPI] FOREIGN KEY([ModuleID])
+REFERENCES [dbo].[tblSiteMasterModules] ([ModuleID])
+GO
+ALTER TABLE [dbo].[tblSiteMasterAPI] CHECK CONSTRAINT [FK_tblMasterModules_tblMasterAPI]
+GO
+ALTER TABLE [dbo].[tblSiteMasterCity]  WITH CHECK ADD  CONSTRAINT [FK_tblMasterCity_tblMasterState] FOREIGN KEY([StateID])
+REFERENCES [dbo].[tblSiteMasterState] ([ID])
+GO
+ALTER TABLE [dbo].[tblSiteMasterCity] CHECK CONSTRAINT [FK_tblMasterCity_tblMasterState]
+GO
+ALTER TABLE [dbo].[tblSiteMasterState]  WITH CHECK ADD  CONSTRAINT [FK_tblStateMaster_tblCountryMaster] FOREIGN KEY([CountryID])
+REFERENCES [dbo].[tblSiteMasterCountry] ([ID])
+GO
+ALTER TABLE [dbo].[tblSiteMasterState] CHECK CONSTRAINT [FK_tblStateMaster_tblCountryMaster]
+GO
+ALTER TABLE [dbo].[tblSiteMeshTerm]  WITH CHECK ADD  CONSTRAINT [FK__tblMeshTe__CSGui__1D114BD1] FOREIGN KEY([CSGuiD])
+REFERENCES [dbo].[tblSiteCSDetails] ([CSGuiD])
+GO
+ALTER TABLE [dbo].[tblSiteMeshTerm] CHECK CONSTRAINT [FK__tblMeshTe__CSGui__1D114BD1]
+GO
+ALTER TABLE [dbo].[tblSiteModuleRoles]  WITH CHECK ADD  CONSTRAINT [FK_tblMasterModules_tblModuleRoles] FOREIGN KEY([ModuleID])
+REFERENCES [dbo].[tblSiteMasterModules] ([ModuleID])
+GO
+ALTER TABLE [dbo].[tblSiteModuleRoles] CHECK CONSTRAINT [FK_tblMasterModules_tblModuleRoles]
+GO
+ALTER TABLE [dbo].[tblSiteModuleRoles]  WITH CHECK ADD  CONSTRAINT [FK_tblMasterRoles_tblModuleRoles] FOREIGN KEY([RoleID])
+REFERENCES [dbo].[tblSiteMasterRoles] ([RoleID])
+GO
+ALTER TABLE [dbo].[tblSiteModuleRoles] CHECK CONSTRAINT [FK_tblMasterRoles_tblModuleRoles]
+GO
+ALTER TABLE [dbo].[tblSiteOrganization]  WITH CHECK ADD  CONSTRAINT [FK_tblCountryMaster_tblOrganizations] FOREIGN KEY([CountryID])
+REFERENCES [dbo].[tblSiteMasterCountry] ([ID])
+GO
+ALTER TABLE [dbo].[tblSiteOrganization] CHECK CONSTRAINT [FK_tblCountryMaster_tblOrganizations]
+GO
+ALTER TABLE [dbo].[tblSiteOrganization]  WITH CHECK ADD  CONSTRAINT [FK_tblOrganization_tblMasterOrganizationType] FOREIGN KEY([OrganizationTypesId])
+REFERENCES [dbo].[tblSiteMasterOrganizationType] ([OrganizationTypeID])
+GO
+ALTER TABLE [dbo].[tblSiteOrganization] CHECK CONSTRAINT [FK_tblOrganization_tblMasterOrganizationType]
+GO
+ALTER TABLE [dbo].[tblSiteOrganization]  WITH CHECK ADD  CONSTRAINT [FK_tblOrganization_tblOrganization] FOREIGN KEY([OrganizationID])
+REFERENCES [dbo].[tblSiteOrganization] ([OrganizationID])
+GO
+ALTER TABLE [dbo].[tblSiteOrganization] CHECK CONSTRAINT [FK_tblOrganization_tblOrganization]
+GO
+ALTER TABLE [dbo].[tblSiteOrganizationMapInvite]  WITH CHECK ADD  CONSTRAINT [FK_tblOrganizationInvite_tblOrganization] FOREIGN KEY([OrganizationId])
+REFERENCES [dbo].[tblSiteOrganization] ([OrganizationID])
+GO
+ALTER TABLE [dbo].[tblSiteOrganizationMapInvite] CHECK CONSTRAINT [FK_tblOrganizationInvite_tblOrganization]
+GO
+ALTER TABLE [dbo].[tblSiteOrganizationMapRole]  WITH CHECK ADD  CONSTRAINT [FK_tblOrganizationMapRole_tblMasterRoles] FOREIGN KEY([RoleID])
+REFERENCES [dbo].[tblSiteMasterRoles] ([RoleID])
+GO
+ALTER TABLE [dbo].[tblSiteOrganizationMapRole] CHECK CONSTRAINT [FK_tblOrganizationMapRole_tblMasterRoles]
+GO
+ALTER TABLE [dbo].[tblSiteOrganizationMapRole]  WITH CHECK ADD  CONSTRAINT [FK_tblUsers_tblOrganizationMapRole] FOREIGN KEY([UserID])
+REFERENCES [dbo].[tblSiteUsers] ([UserID])
+GO
+ALTER TABLE [dbo].[tblSiteOrganizationMapRole] CHECK CONSTRAINT [FK_tblUsers_tblOrganizationMapRole]
+GO
+ALTER TABLE [dbo].[tblSiteParticipantHealthRecord]  WITH CHECK ADD FOREIGN KEY([HealthCategoryId])
+REFERENCES [dbo].[tblSiteMasterHealthCategory] ([HealthCategoryId])
+GO
+ALTER TABLE [dbo].[tblSiteResponsibleParty]  WITH CHECK ADD  CONSTRAINT [FK__tblRespon__CSGui__2882FE7D] FOREIGN KEY([CSGuiD])
+REFERENCES [dbo].[tblSiteCSDetails] ([CSGuiD])
+GO
+ALTER TABLE [dbo].[tblSiteResponsibleParty] CHECK CONSTRAINT [FK__tblRespon__CSGui__2882FE7D]
+GO
+ALTER TABLE [dbo].[tblSiteSmtp]  WITH CHECK ADD  CONSTRAINT [FK_tblOrganizations_tblSmtp] FOREIGN KEY([OrganizationsID])
+REFERENCES [dbo].[tblSiteOrganization] ([OrganizationID])
+GO
+ALTER TABLE [dbo].[tblSiteSmtp] CHECK CONSTRAINT [FK_tblOrganizations_tblSmtp]
+GO
+ALTER TABLE [dbo].[tblSiteUIChildUserRoleAssign]  WITH CHECK ADD  CONSTRAINT [FK_tblUIChildUserRoleAssign_tblMasterRoles] FOREIGN KEY([RoleID])
+REFERENCES [dbo].[tblSiteMasterRoles] ([RoleID])
+GO
+ALTER TABLE [dbo].[tblSiteUIChildUserRoleAssign] CHECK CONSTRAINT [FK_tblUIChildUserRoleAssign_tblMasterRoles]
+GO
+ALTER TABLE [dbo].[tblSiteUIChildUserRoleAssign]  WITH CHECK ADD  CONSTRAINT [FK_tblUIChildUserRoleAssign_tblUsers] FOREIGN KEY([UserID])
+REFERENCES [dbo].[tblSiteUsers] ([UserID])
+GO
+ALTER TABLE [dbo].[tblSiteUIChildUserRoleAssign] CHECK CONSTRAINT [FK_tblUIChildUserRoleAssign_tblUsers]
+GO
+ALTER TABLE [dbo].[tblSiteUIRoleWiseSideMenuPermission]  WITH CHECK ADD  CONSTRAINT [FK_tblUIRoleWiseSideMenuPermission_tblMasterRoles] FOREIGN KEY([RoleID])
+REFERENCES [dbo].[tblSiteMasterRoles] ([RoleID])
+GO
+ALTER TABLE [dbo].[tblSiteUIRoleWiseSideMenuPermission] CHECK CONSTRAINT [FK_tblUIRoleWiseSideMenuPermission_tblMasterRoles]
+GO
+ALTER TABLE [dbo].[tblSiteUIRoleWiseSideMenuPermission]  WITH CHECK ADD  CONSTRAINT [FK_tblUIRoleWiseSideMenuPermission_tblSiteUISideMenuAction] FOREIGN KEY([SideMenuActionID])
+REFERENCES [dbo].[tblSiteUISideMenuAction] ([SideMenuActionID])
+GO
+ALTER TABLE [dbo].[tblSiteUIRoleWiseSideMenuPermission] CHECK CONSTRAINT [FK_tblUIRoleWiseSideMenuPermission_tblSiteUISideMenuAction]
+GO
+ALTER TABLE [dbo].[tblSiteUISideMenu]  WITH CHECK ADD  CONSTRAINT [FK_tblUISideMenu_tblMasterOrganizationType] FOREIGN KEY([OrganizationTypeID])
+REFERENCES [dbo].[tblSiteMasterOrganizationType] ([OrganizationTypeID])
+GO
+ALTER TABLE [dbo].[tblSiteUISideMenu] CHECK CONSTRAINT [FK_tblUISideMenu_tblMasterOrganizationType]
+GO
+ALTER TABLE [dbo].[tblSiteUISideMenu]  WITH CHECK ADD  CONSTRAINT [FK_tblUISideMenu_tblUISideMenu] FOREIGN KEY([ParentSideMenuID])
+REFERENCES [dbo].[tblSiteUISideMenu] ([UISideMenuID])
+GO
+ALTER TABLE [dbo].[tblSiteUISideMenu] CHECK CONSTRAINT [FK_tblUISideMenu_tblUISideMenu]
+GO
+ALTER TABLE [dbo].[tblSiteUISideMenuAction]  WITH CHECK ADD  CONSTRAINT [FK_tblUINavMenuAction_tblUIAction] FOREIGN KEY([ActionID])
+REFERENCES [dbo].[tblSiteUIAction] ([ActionID])
+GO
+ALTER TABLE [dbo].[tblSiteUISideMenuAction] CHECK CONSTRAINT [FK_tblUINavMenuAction_tblUIAction]
+GO
+ALTER TABLE [dbo].[tblSiteUserDomainRoles]  WITH CHECK ADD  CONSTRAINT [FK_tblMasterRoles_tblUserDomainRoles] FOREIGN KEY([RoleID])
+REFERENCES [dbo].[tblSiteMasterRoles] ([RoleID])
+GO
+ALTER TABLE [dbo].[tblSiteUserDomainRoles] CHECK CONSTRAINT [FK_tblMasterRoles_tblUserDomainRoles]
+GO
+ALTER TABLE [dbo].[tblSiteUserProfiles]  WITH CHECK ADD  CONSTRAINT [FK_tblCountryMaster_tblUserProfiles] FOREIGN KEY([CountryID])
+REFERENCES [dbo].[tblSiteMasterCountry] ([ID])
+GO
+ALTER TABLE [dbo].[tblSiteUserProfiles] CHECK CONSTRAINT [FK_tblCountryMaster_tblUserProfiles]
+GO
+ALTER TABLE [dbo].[tblSiteUserRoles]  WITH CHECK ADD  CONSTRAINT [FK_tblMasterRoles_tblUserRoles] FOREIGN KEY([DomainRoleID])
+REFERENCES [dbo].[tblSiteMasterRoles] ([RoleID])
+GO
+ALTER TABLE [dbo].[tblSiteUserRoles] CHECK CONSTRAINT [FK_tblMasterRoles_tblUserRoles]
+GO
+ALTER TABLE [dbo].[tblSiteUsers]  WITH CHECK ADD  CONSTRAINT [FK_tblUsers_tblAccountInvites] FOREIGN KEY([AccountInviteGuid])
+REFERENCES [dbo].[tblSiteAccountInvites] ([AccountInviteGuid])
+GO
+ALTER TABLE [dbo].[tblSiteUsers] CHECK CONSTRAINT [FK_tblUsers_tblAccountInvites]
+GO
+ALTER TABLE [dbo].[tblSiteVendors]  WITH CHECK ADD  CONSTRAINT [FK_tblOrganization_tblVendors] FOREIGN KEY([OrganizationID])
+REFERENCES [dbo].[tblSiteOrganization] ([OrganizationID])
+GO
+ALTER TABLE [dbo].[tblSiteVendors] CHECK CONSTRAINT [FK_tblOrganization_tblVendors]
+GO
+ALTER TABLE [dbo].[tblSiteVendors]  WITH CHECK ADD  CONSTRAINT [FK_tblSubscription_tblVendors] FOREIGN KEY([SubscriptionID])
+REFERENCES [dbo].[tblSiteSubscription] ([SubscriptionID])
+GO
+ALTER TABLE [dbo].[tblSiteVendors] CHECK CONSTRAINT [FK_tblSubscription_tblVendors]
+GO
